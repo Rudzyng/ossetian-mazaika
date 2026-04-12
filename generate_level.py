@@ -58,7 +58,7 @@ def place_image(
     background.save(output_path)
 
 
-place_image('field/1.png', 'images_generate/1.png', 'result.png', (100, 200))
+place_image('field/1.png', 'images_generate/1.png', 'result.png', (50, 200))
 # нумерация в блоке:
 #    1
 #  0   2
