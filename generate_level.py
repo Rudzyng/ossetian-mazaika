@@ -1,1 +1,13 @@
+import PIL
 
+IMAGE_HEIGHT = 200
+IMAGE_WIDTH = 200
+WIDTH_FIELD = 2
+HEIGHT_FIELD = 2
+NUMBER_IMAGES = 8
+DIRECTORY_IMAGES = "images"
+FORMAT_IMAGE = ".png"
+SQUARE_WIDTH = IMAGE_HEIGHT * 3
+
+
+field = [["" for i in range(WIDTH_FIELD)] for x in range(HEIGHT_FIELD)]
