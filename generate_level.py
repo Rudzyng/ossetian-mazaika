@@ -12,14 +12,14 @@ DIRECTORY_FINAL_FIELD = "final_field"
 DIRECTORY_FIELD = "field"
 
 
-def generate_square():
-    img = Image.new('RGB', (SQUARE_WIDTH, SQUARE_WIDTH), 'white')
+def draw_square(wid=SQUARE_WIDTH):
+    img = Image.new('RGB', (wid, wid), 'white')
     draw = ImageDraw.Draw(img)
 
-    draw.rectangle([0, 0, SQUARE_WIDTH - 1, SQUARE_WIDTH - 1], outline='black', width=2)
+    draw.rectangle([0, 0, wid - 1, wid - 1], outline='black', width=2)
 
-    draw.line([0, 0, SQUARE_WIDTH - 1, SQUARE_WIDTH - 1], fill='black', width=2)
-    draw.line([SQUARE_WIDTH - 1, 0, 0, SQUARE_WIDTH - 1], fill='black', width=2)
+    draw.line([0, 0, wid - 1, wid - 1], fill='black', width=2)
+    draw.line([wid - 1, 0, 0, wid - 1], fill='black', width=2)
 
     img.save('square.png')
 
@@ -51,4 +51,4 @@ def generate(img_width, img_height, image_direct, format, field_direct, final_di
         background.save(f'{final_direct}/{i + 1}{format}')
 
 
-generate(IMAGE_WIDTH, IMAGE_HEIGHT, DIRECTORY_IMAGES, FORMAT_IMAGE, DIRECTORY_FIELD, DIRECTORY_FINAL_FIELD)
+generate(IMAGE_WIDTH, IMAGE_HEIGHT, DIRECTORY_IMAGES, FORMAT_IMAGE, DIRECTORY_FIELD, DIRECTORY_FINAL_FIELD) # результат в final_field
