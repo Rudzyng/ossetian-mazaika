@@ -1,5 +1,4 @@
 from PIL import Image, ImageDraw
-from typing import Tuple, Optional
 
 IMAGE_HEIGHT = 200
 IMAGE_WIDTH = 200
@@ -11,6 +10,7 @@ FORMAT_IMAGE = ".png"
 SQUARE_WIDTH = IMAGE_HEIGHT * 3
 DIRECTORY_FINAL_FIELD = "final_field"
 DIRECTORY_FIELD = "field"
+
 
 def generate_square():
     img = Image.new('RGB', (SQUARE_WIDTH, SQUARE_WIDTH), 'white')
