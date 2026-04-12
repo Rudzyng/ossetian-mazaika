@@ -55,7 +55,8 @@ def generate(img_width, img_height, image_direct, format, field_direct, final_di
     #    1
     #  0   2
     #    3
-    coords_for_image = [(0, img_height), (img_width, 0), (2 * img_width, 2 * img_height), (img_width, img_height * 2)]
+    coords_for_image = [(0, img_height), (img_width, 0), (2 * img_width, img_height), (img_width, img_height * 2)]
+    # place_image('field/1.png', 'images_generate/2.png', 'result.png', coords_for_image[3])
     field = [[("", 1) for i in range(4)] for x in range(4)]
     indexes_images = [(0, 2), (1, 3), (0, 2), (1, 3)]
     indexes_text = [(1, 3), (0, 2), (1, 3), (0, 2)]
@@ -66,4 +67,4 @@ def generate(img_width, img_height, image_direct, format, field_direct, final_di
             counter += 1
             place_image(f'{field_direct}/{i + 1}.png', field[i][ind_img][0], f'{final_direct}/{i + 1}.png', coords_for_image[ind_img])
 
-# generate(IMAGE_WIDTH, IMAGE_HEIGHT, DIRECTORY_IMAGES, FORMAT_IMAGE, DIRECTORY_FIELD, DIRECTORY_FINAL_FIELD)
+generate(IMAGE_WIDTH, IMAGE_HEIGHT, DIRECTORY_IMAGES, FORMAT_IMAGE, DIRECTORY_FIELD, DIRECTORY_FINAL_FIELD)
