@@ -23,7 +23,7 @@ def generate_square():
     img.save('square.png')
 
 
-def place_image(background_path, overlay_path, output_path, position, size, alpha):
+def place_image(background_path, overlay_path, output_path, position, size=None, alpha=True):
     """
         background_path: путь к фоновому изображению
         overlay_path: путь к вставляемому изображению
@@ -46,7 +46,8 @@ def place_image(background_path, overlay_path, output_path, position, size, alph
     background.save(output_path)
 
 
-place_image('field/1.png', 'images_generate/1.png', 'result.png', (IMAGE_WIDTH // 4, SQUARE_WIDTH // 2 - IMAGE_HEIGHT // 2))
+coords_for_image = [(0, IMAGE_HEIGHT), (IMAGE_WIDTH, 0), (2 * IMAGE_WIDTH, 2 * IMAGE_HEIGHT), (IMAGE_WIDTH, IMAGE_HEIGHT * 2)]
+# place_image('field/1.png', 'images_generate/1.png', 'result.png', (IMAGE_WIDTH, IMAGE_HEIGHT * 2))
 # нумерация в блоке:
 #    1
 #  0   2
