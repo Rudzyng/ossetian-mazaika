@@ -1,4 +1,5 @@
 from PIL import Image, ImageDraw
+from typing import Tuple, Optional
 
 IMAGE_HEIGHT = 200
 IMAGE_WIDTH = 200
@@ -22,6 +23,42 @@ def generate_square():
     img.save('square.png')
 
 
+def place_image(
+    background_path: str,
+    overlay_path: str,
+    output_path: str,
+    position: Tuple[int, int],
+    size: Optional[Tuple[int, int]] = None,
+    alpha: bool = True
+) -> None:
+    """
+    Args:
+        background_path: путь к фоновому изображению
+        overlay_path: путь к вставляемому изображению
+        output_path: путь для сохранения результата
+        position: координаты (x, y) для вставки
+        size: новый размер для вставляемого изображения (опционально)
+        alpha: учитывать ли альфа-канал
+    """
+    # Загружаем изображения
+    background = Image.open(background_path)
+    overlay = Image.open(overlay_path)
+    
+    # Изменяем размер если нужно
+    if size:
+        overlay = overlay.resize(size)
+    
+    # Вставляем
+    if alpha and overlay.mode == 'RGBA':
+        background.paste(overlay, position, overlay)
+    else:
+        background.paste(overlay, position)
+    
+    # Сохраняем
+    background.save(output_path)
+
+
+place_image('field/1.png', 'images_generate/1.png', 'result.png', (100, 200))
 # нумерация в блоке:
 #    1
 #  0   2
