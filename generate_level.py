@@ -46,18 +46,24 @@ def place_image(background_path, overlay_path, output_path, position, size=None,
     background.save(output_path)
 
 
-coords_for_image = [(0, IMAGE_HEIGHT), (IMAGE_WIDTH, 0), (2 * IMAGE_WIDTH, 2 * IMAGE_HEIGHT), (IMAGE_WIDTH, IMAGE_HEIGHT * 2)]
 # place_image('field/1.png', 'images_generate/1.png', 'result.png', (IMAGE_WIDTH, IMAGE_HEIGHT * 2))
 # нумерация в блоке:
 #    1
 #  0   2
 #    3
-field = [[("", 1) for i in range(4)] for x in range(4)]
-indexes_images = [[0, 2], [1, 3], [0, 2], [1, 3]]
-indexes_text = [[1, 3], [0, 2], [1, 3], [0, 2]]
 
-counter = 1
-for i in range(len(indexes_images)):
-    for ind_img in indexes_images[i]:
-        field[i][ind_img] = (f"{DIRECTORY_IMAGES}/{counter}{FORMAT_IMAGE}", 1)
-        counter += 1
+
+def generate(img_width, img_height, direct, format):
+    coords_for_image = [(0, img_height), (img_width, 0), (2 * img_width, 2 * img_height), (img_width, img_height * 2)]
+    field = [[("", 1) for i in range(4)] for x in range(4)]
+    indexes_images = [[0, 2], [1, 3], [0, 2], [1, 3]]
+    indexes_text = [[1, 3], [0, 2], [1, 3], [0, 2]]
+
+    counter = 1
+    for i in range(len(indexes_images)):
+        for ind_img in indexes_images[i]:
+            field[i][ind_img] = (f"{direct}/{counter}{format}", 1)
+            counter += 1
+
+
+generate(IMAGE_WIDTH, IMAGE_HEIGHT, DIRECTORY_IMAGES, FORMAT_IMAGE)
