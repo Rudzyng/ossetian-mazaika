@@ -9,7 +9,8 @@ NUMBER_IMAGES = 8
 DIRECTORY_IMAGES = "images_generate"
 FORMAT_IMAGE = ".png"
 SQUARE_WIDTH = IMAGE_HEIGHT * 3
-
+DIRECTORY_FINAL_FIELD = "final_field"
+DIRECTORY_FIELD = "field"
 
 def generate_square():
     img = Image.new('RGB', (SQUARE_WIDTH, SQUARE_WIDTH), 'white')
@@ -47,23 +48,22 @@ def place_image(background_path, overlay_path, output_path, position, size=None,
 
 
 # place_image('field/1.png', 'images_generate/1.png', 'result.png', (IMAGE_WIDTH, IMAGE_HEIGHT * 2))
-# нумерация в блоке:
-#    1
-#  0   2
-#    3
 
 
-def generate(img_width, img_height, direct, format):
+def generate(img_width, img_height, image_direct, format, field_direct, final_direct):
+    # нумерация в блоке:
+    #    1
+    #  0   2
+    #    3
     coords_for_image = [(0, img_height), (img_width, 0), (2 * img_width, 2 * img_height), (img_width, img_height * 2)]
     field = [[("", 1) for i in range(4)] for x in range(4)]
-    indexes_images = [[0, 2], [1, 3], [0, 2], [1, 3]]
-    indexes_text = [[1, 3], [0, 2], [1, 3], [0, 2]]
-
+    indexes_images = [(0, 2), (1, 3), (0, 2), (1, 3)]
+    indexes_text = [(1, 3), (0, 2), (1, 3), (0, 2)]
     counter = 1
     for i in range(len(indexes_images)):
         for ind_img in indexes_images[i]:
-            field[i][ind_img] = (f"{direct}/{counter}{format}", 1)
+            field[i][ind_img] = (f"{image_direct}/{counter}{format}", 1)
             counter += 1
+            place_image(f'{field_direct}/{i + 1}.png', field[i][ind_img][0], f'{final_direct}/{i + 1}.png', coords_for_image[ind_img])
 
-
-generate(IMAGE_WIDTH, IMAGE_HEIGHT, DIRECTORY_IMAGES, FORMAT_IMAGE)
+# generate(IMAGE_WIDTH, IMAGE_HEIGHT, DIRECTORY_IMAGES, FORMAT_IMAGE, DIRECTORY_FIELD, DIRECTORY_FINAL_FIELD)
