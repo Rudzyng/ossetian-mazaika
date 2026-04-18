@@ -82,4 +82,7 @@ if __name__ == "__main__":
     # generate(IMAGE_WIDTH, IMAGE_HEIGHT, DIRECTORY_IMAGES, FORMAT_IMAGE, DIRECTORY_FIELD, DIRECTORY_FINAL_FIELD) # результат в final_field
     # generate_field("test")
     # text_on_pic("final_field/1.png", "тигр", (200, 100))
-    pass
+    img = Image.open('final_field/1.png')
+    font = ImageFont.truetype("arial.ttf", 36)
+    add_centered_text(img, "тигр", img.width // 2, 100, font)
+    img.save('output.png')
