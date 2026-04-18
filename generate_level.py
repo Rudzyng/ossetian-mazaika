@@ -51,7 +51,7 @@ def add_centered_text(image, text, center_x, center_y, font, color=(0, 0, 0)):
     return image
 
 
-def generate(img_width, img_height, image_direct, format, field_direct, final_direct):
+def generate(img_width, img_height, image_direct, format, field_direct, final_direct, comp):
     # нумерация в блоке:
     #    1
     #  0   2
@@ -60,6 +60,7 @@ def generate(img_width, img_height, image_direct, format, field_direct, final_di
     coords_for_image = [(0, img_height), (img_width, 0), (2 * img_width, img_height), (img_width, img_height * 2)]
     indexes_images = [(0, 2), (1, 3), (1, 3), (0, 2)]
     indexes_text = [(1, 3), (0, 2), (0, 2), (1, 3)]
+    pairs = []
     counter = 1
     for i in range(4):
         background = Image.open(f'{field_direct}/{i + 1}{format}')
@@ -81,7 +82,8 @@ def generate(img_width, img_height, image_direct, format, field_direct, final_di
 
 
 if __name__ == "__main__":
-    generate(IMAGE_WIDTH, IMAGE_HEIGHT, DIRECTORY_IMAGES, FORMAT_IMAGE, DIRECTORY_FIELD, DIRECTORY_FINAL_FIELD) # результат в final_field
+    dict_comp = ["баран", "кошка", "собака", "хомяк", "лягушка", "тигр", "голубь", "обезьяна"]
+    generate(IMAGE_WIDTH, IMAGE_HEIGHT, DIRECTORY_IMAGES, FORMAT_IMAGE, DIRECTORY_FIELD, DIRECTORY_FINAL_FIELD, dict_comp) # результат в final_field
     # generate_field("test")
     # text_on_pic("final_field/1.png", "тигр", (200, 100))
     # img = Image.open('final_field/1.png')
