@@ -58,12 +58,11 @@ def generate(img_width, img_height, image_direct, format, field_direct, final_di
     #    3
     rotations = [-90, 0, 90, 0]
     coords_for_image = [(0, img_height), (img_width, 0), (2 * img_width, img_height), (img_width, img_height * 2)]
-    field = [[("", 1) for i in range(4)] for x in range(4)]
     indexes_images = [(0, 2), (1, 3), (1, 3), (0, 2)]
     indexes_text = [(1, 3), (0, 2), (0, 2), (1, 3)]
     counter = 1
     for i in range(4):
-        background = Image.open(f'{field_direct}/{i + 1}.png')
+        background = Image.open(f'{field_direct}/{i + 1}{format}')
         overlay1 = Image.open(f"{image_direct}/{counter}{format}")
         rotated1 = overlay1.rotate(rotations[indexes_images[i][0]])
         if overlay1.mode == 'RGBA':
