@@ -65,6 +65,6 @@ def generate(img_width, img_height, image_direct, format, field_direct, final_di
 
 
 if __name__ == "__main__":
-    generate(IMAGE_WIDTH, IMAGE_HEIGHT, DIRECTORY_IMAGES, FORMAT_IMAGE, DIRECTORY_FIELD, DIRECTORY_FINAL_FIELD) # результат в final_field
+    # generate(IMAGE_WIDTH, IMAGE_HEIGHT, DIRECTORY_IMAGES, FORMAT_IMAGE, DIRECTORY_FIELD, DIRECTORY_FINAL_FIELD) # результат в final_field
     # generate_field("test")
-    # text_on_pic("1.png", )
+    text_on_pic("final_field/1.png", "тигр", (200, 100))
