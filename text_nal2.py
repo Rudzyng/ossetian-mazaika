@@ -64,8 +64,8 @@ img = Image.open('result.png')
 font = ImageFont.truetype("arial.ttf", 36)
 
 # Разные варианты
-add_centered_text(img, "горизонтально", img.width//2, 80, font, rotation=0)
-add_centered_text(img, "вертикально", img.width//2, 180, font, color=(255, 0, 0), rotation=90)
-add_centered_text(img, "вверх ногами", img.width//2, 280, font, color=(0, 0, 255), rotation=-90)
+#add_centered_text(img, "горизонтально", img.width//2, 80, font, rotation=0)
+#add_centered_text(img, "вертикально", img.width//2, 180, font, color=(255, 0, 0), rotation=90)
+add_centered_text(img, "вверх ногами", 300, 100, font, color=(0, 0, 255), rotation=-90)
 
 img.save('output.png')
