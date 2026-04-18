@@ -1,4 +1,4 @@
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 
 IMAGE_HEIGHT = 200
 IMAGE_WIDTH = 200
@@ -29,6 +29,14 @@ def generate_field(final_dir, wid=WIDTH_FIELD, hei=HEIGHT_FIELD, wid_sqr=SQUARE_
         draw_square(f"{final_dir}/{i + 1}.png", wid=wid_sqr)
 
 
+def text_on_pic(picture, text, pos, color=(0, 0, 0), txt_font="arial.ttf", size=36):
+    image = Image.open(picture)
+    draw = ImageDraw.Draw(image)
+    font = ImageFont.truetype(txt_font, size)
+    draw.text(pos, text, font=font, fill=color)
+    image.save('output.png')
+
+
 def generate(img_width, img_height, image_direct, format, field_direct, final_direct):
     # нумерация в блоке:
     #    1
@@ -57,5 +65,6 @@ def generate(img_width, img_height, image_direct, format, field_direct, final_di
 
 
 if __name__ == "__main__":
-    generate(IMAGE_WIDTH, IMAGE_HEIGHT, DIRECTORY_IMAGES, FORMAT_IMAGE, DIRECTORY_FIELD, DIRECTORY_FINAL_FIELD) # результат в final_field
-    generate_field("test")
+    # generate(IMAGE_WIDTH, IMAGE_HEIGHT, DIRECTORY_IMAGES, FORMAT_IMAGE, DIRECTORY_FIELD, DIRECTORY_FINAL_FIELD) # результат в final_field
+    # generate_field("test")
+    text_on_pic("1.png", )
