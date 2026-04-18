@@ -44,8 +44,8 @@ def generate(img_width, img_height, image_direct, format, field_direct, final_di
     #    3
     coords_for_image = [(0, img_height), (img_width, 0), (2 * img_width, img_height), (img_width, img_height * 2)]
     field = [[("", 1) for i in range(4)] for x in range(4)]
-    indexes_images = [(0, 2), (1, 3), (0, 2), (1, 3)]
-    indexes_text = [(1, 3), (0, 2), (1, 3), (0, 2)]
+    indexes_images = [(0, 2), (1, 3), (1, 3), (0, 2)]
+    indexes_text = [(1, 3), (0, 2), (0, 2), (1, 3)]
     counter = 1
     for i in range(4):
         background = Image.open(f'{field_direct}/{i + 1}.png')
@@ -65,6 +65,6 @@ def generate(img_width, img_height, image_direct, format, field_direct, final_di
 
 
 if __name__ == "__main__":
-    # generate(IMAGE_WIDTH, IMAGE_HEIGHT, DIRECTORY_IMAGES, FORMAT_IMAGE, DIRECTORY_FIELD, DIRECTORY_FINAL_FIELD) # результат в final_field
+    generate(IMAGE_WIDTH, IMAGE_HEIGHT, DIRECTORY_IMAGES, FORMAT_IMAGE, DIRECTORY_FIELD, DIRECTORY_FINAL_FIELD) # результат в final_field
     # generate_field("test")
-    text_on_pic("1.png", )
+    # text_on_pic("1.png", )
