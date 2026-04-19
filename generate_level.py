@@ -62,6 +62,12 @@ def generate(img_width, img_height, image_direct, format, field_direct, final_di
     indexes_text = [(1, 3), (0, 2), (0, 2), (1, 3)]
     pairs = [[(1, 2), (1, 0)], [(3, 3), (3, 1)], [(0, 3), (0, 1)], [(2, 2), (2, 0)]]
     field_text = [["", ""], ["", ""], ["", ""], ["", ""]]
+    count_text = 0
+    for x in range(4):
+        for y in range(2):
+            field_text[x][y] = comp[count_text]
+            count_text += 1
+    print(field_text)
     counter = 1
     for i in range(4):
         background = Image.open(f"{field_direct}/{i + 1}{format}")
