@@ -82,6 +82,6 @@ if __name__ == "__main__":
     # generate_field("test")
     # text_on_pic("final_field/1.png", "тигр", (200, 100))
     img = Image.open("final_field/1.png")
-    font = ImageFont.truetype("static/fonts/font1.ttf", 36)
+    font = ImageFont.truetype("static/fonts/candara.ttf", 36)
     add_centered_text(img, "тигрæ", img.width // 2, 100, font)
     img.save("output.png")
