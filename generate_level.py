@@ -101,7 +101,7 @@ def generate(img_width, img_height, image_direct, format, field_direct, final_di
 
 
 if __name__ == "__main__":
-    dict_comp = ["баран", "кошка", "собака", "хомяк", "лягушка", "тигр", "голубь", "обезьяна"]
+    dict_comp = ["фыркъа", "гæды", "куыдз", "къуда уыры", "хæфс", "тигр", "бæлон", "маймули"]
     generate(IMAGE_WIDTH, IMAGE_HEIGHT, DIRECTORY_IMAGES, FORMAT_IMAGE, DIRECTORY_FIELD, DIRECTORY_FINAL_FIELD, dict_comp) # результат в final_field
     # generate_field("test")
     # text_on_pic("final_field/1.png", "тигр", (200, 100))
