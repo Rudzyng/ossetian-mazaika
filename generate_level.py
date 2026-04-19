@@ -64,6 +64,7 @@ def generate(img_width, img_height, image_direct, format, field_direct, final_di
     field_text = [["", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""]]
 
     count_text = 0
+    font = ImageFont.truetype("static/fonts/candara.ttf", 56)
     for i in range(4):
         for j in range(2):
             x, y = pairs[i][j]
@@ -83,8 +84,18 @@ def generate(img_width, img_height, image_direct, format, field_direct, final_di
         background.paste(rotated2, coords_for_image[indexes_images[i][1]], rotated2)
         counter_img += 1
 
+        y_coord = 100
+        text1 = field_text[i][indexes_text[i][0]]
+        background = background.rotate(rotations[indexes_text[i][0]])
+        add_centered_text(background, text1, background.width // 2, y_coord, font)
+        background = background.rotate(-rotations[indexes_text[i][0]])
 
-
+        text2 = field_text[i][indexes_text[i][1]]
+        background = background.rotate(rotations[indexes_text[i][1]])
+        if indexes_text[i][1] == 3:
+            y_coord = 500
+        add_centered_text(background, text2, background.width // 2, y_coord, font)
+        background = background.rotate(-rotations[indexes_text[i][1]])
 
         background.save(f'{final_direct}/{i + 1}{format}')
 
