@@ -63,20 +63,15 @@ def generate(img_width, img_height, image_direct, format, field_direct, final_di
     pairs = []
     counter = 1
     for i in range(4):
-        background = Image.open(f'{field_direct}/{i + 1}{format}')
+        background = Image.open(f"{field_direct}/{i + 1}{format}")
         overlay1 = Image.open(f"{image_direct}/{counter}{format}")
         rotated1 = overlay1.rotate(rotations[indexes_images[i][0]])
-        if overlay1.mode == 'RGBA':
-            background.paste(rotated1, coords_for_image[indexes_images[i][0]], rotated1)
-        else:
-            background.paste(rotated1, coords_for_image[indexes_images[i][0]])
+        background.paste(rotated1, coords_for_image[indexes_images[i][0]], rotated1)
         counter += 1
+
         overlay2 = Image.open(f"{image_direct}/{counter}{format}")
         rotated2 = overlay2.rotate(rotations[indexes_images[i][1]])
-        if overlay2.mode == 'RGBA':
-            background.paste(rotated2, coords_for_image[indexes_images[i][1]], rotated2)
-        else:
-            background.paste(rotated2, coords_for_image[indexes_images[i][1]])
+        background.paste(rotated2, coords_for_image[indexes_images[i][1]], rotated2)
         counter += 1
         background.save(f'{final_direct}/{i + 1}{format}')
 
