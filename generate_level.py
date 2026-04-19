@@ -62,25 +62,30 @@ def generate(img_width, img_height, image_direct, format, field_direct, final_di
     indexes_text = [(1, 3), (0, 2), (0, 2), (1, 3)]
     pairs = [[(1, 2), (1, 0)], [(3, 3), (3, 1)], [(0, 3), (0, 1)], [(2, 2), (2, 0)]]
     field_text = [["", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""]]
+
     count_text = 0
     for i in range(4):
         for j in range(2):
             x, y = pairs[i][j]
             field_text[x][y] = comp[count_text]
             count_text += 1
-    counter = 1
-    print(field_text)
+
+    counter_img = 1
     for i in range(4):
         background = Image.open(f"{field_direct}/{i + 1}{format}")
-        overlay1 = Image.open(f"{image_direct}/{counter}{format}")
+        overlay1 = Image.open(f"{image_direct}/{counter_img}{format}")
         rotated1 = overlay1.rotate(rotations[indexes_images[i][0]])
         background.paste(rotated1, coords_for_image[indexes_images[i][0]], rotated1)
-        counter += 1
+        counter_img += 1
 
-        overlay2 = Image.open(f"{image_direct}/{counter}{format}")
+        overlay2 = Image.open(f"{image_direct}/{counter_img}{format}")
         rotated2 = overlay2.rotate(rotations[indexes_images[i][1]])
         background.paste(rotated2, coords_for_image[indexes_images[i][1]], rotated2)
-        counter += 1
+        counter_img += 1
+
+
+
+
         background.save(f'{final_direct}/{i + 1}{format}')
 
 
