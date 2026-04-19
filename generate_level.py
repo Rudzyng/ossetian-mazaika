@@ -67,7 +67,6 @@ def generate(img_width, img_height, image_direct, format, field_direct, final_di
         for y in range(2):
             field_text[x][y] = comp[count_text]
             count_text += 1
-    print(field_text)
     counter = 1
     for i in range(4):
         background = Image.open(f"{field_direct}/{i + 1}{format}")
