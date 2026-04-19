@@ -60,7 +60,8 @@ def generate(img_width, img_height, image_direct, format, field_direct, final_di
     coords_for_image = [(0, img_height), (img_width, 0), (2 * img_width, img_height), (img_width, img_height * 2)]
     indexes_images = [(0, 2), (1, 3), (1, 3), (0, 2)]
     indexes_text = [(1, 3), (0, 2), (0, 2), (1, 3)]
-    pairs = []
+    pairs = [[(1, 2), (1, 0)], [(3, 3), (3, 1)], [(0, 3), (0, 1)], [(2, 2), (2, 0)]]
+    field_text = [["", ""], ["", ""], ["", ""], ["", ""]]
     counter = 1
     for i in range(4):
         background = Image.open(f"{field_direct}/{i + 1}{format}")
