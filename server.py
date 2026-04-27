@@ -8,7 +8,7 @@ app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 @app.route("/")
 @app.route("/index")
 def index():
-    return render_template("base.html")
+    return render_template("index.html")
 
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -25,22 +25,22 @@ def login():
 
 @app.route('/play_level1')
 def play_level1():
-    pass
+    return render_template("index.html")
 
 
 @app.route('/play_level2')
-def play_level1():
-    pass
+def play_level2():
+    return render_template("index.html")
 
 
 @app.route('/play_level3')
-def play_level1():
-    pass
+def play_level3():
+    return render_template("index.html")
 
 
 @app.route('/create')
 def create():
-    pass
+    return render_template("index.html")
 
 
 def main():
