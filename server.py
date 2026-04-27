@@ -64,6 +64,13 @@ def login():
     return render_template('login.html', title='Авторизация', form=form)
 
 
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect("/")
+
+
 @app.route('/play_level1')
 def play_level1():
     return render_template("index.html")
