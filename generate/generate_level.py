@@ -10,6 +10,7 @@ FORMAT_IMAGE = ".png"
 SQUARE_WIDTH = IMAGE_HEIGHT * 3
 DIRECTORY_FINAL_FIELD = "final_field"
 DIRECTORY_FIELD = "field"
+DIR = "generate/"
 
 
 def draw_square(final_file, wid=SQUARE_WIDTH):
@@ -64,7 +65,7 @@ def generate(img_width, img_height, image_direct, format, field_direct, final_di
     field_text = [["", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""]]
 
     count_text = 0
-    font = ImageFont.truetype("static/fonts/candara.ttf", 56)
+    font = ImageFont.truetype(DIR + "fonts/candara.ttf", 56)
     for i in range(4):
         for j in range(2):
             x, y = pairs[i][j]
@@ -73,13 +74,13 @@ def generate(img_width, img_height, image_direct, format, field_direct, final_di
 
     counter_img = 1
     for i in range(4):
-        background = Image.open(f"{field_direct}/{i + 1}{format}")
-        overlay1 = Image.open(f"{image_direct}/{counter_img}{format}")
+        background = Image.open(DIR + f"{field_direct}/{i + 1}{format}")
+        overlay1 = Image.open(DIR + f"{image_direct}/{counter_img}{format}")
         rotated1 = overlay1.rotate(rotations[indexes_images[i][0]])
         background.paste(rotated1, coords_for_image[indexes_images[i][0]], rotated1)
         counter_img += 1
 
-        overlay2 = Image.open(f"{image_direct}/{counter_img}{format}")
+        overlay2 = Image.open(DIR + f"{image_direct}/{counter_img}{format}")
         rotated2 = overlay2.rotate(rotations[indexes_images[i][1]])
         background.paste(rotated2, coords_for_image[indexes_images[i][1]], rotated2)
         counter_img += 1
@@ -97,7 +98,7 @@ def generate(img_width, img_height, image_direct, format, field_direct, final_di
         add_centered_text(background, text2, background.width // 2, y_coord, font)
         background = background.rotate(-rotations[indexes_text[i][1]])
 
-        background.save(f'{final_direct}/{i + 1}{format}')
+        background.save(DIR + f'{final_direct}/{i + 1}{format}')
 
 
 if __name__ == "__main__":
@@ -105,7 +106,7 @@ if __name__ == "__main__":
     generate(IMAGE_WIDTH, IMAGE_HEIGHT, DIRECTORY_IMAGES, FORMAT_IMAGE, DIRECTORY_FIELD, DIRECTORY_FINAL_FIELD, dict_comp) # результат в final_field
     # generate_field("test")
     # text_on_pic("final_field/1.png", "тигр", (200, 100))
-    img = Image.open("final_field/1.png")
-    font = ImageFont.truetype("static/fonts/candara.ttf", 56)
+    img = Image.open(DIR + "final_field/1.png")
+    font = ImageFont.truetype(DIR + "fonts/candara.ttf", 56)
     add_centered_text(img, "лягушка", img.width // 2, 100, font)
-    img.save("output.png")
+    img.save(DIR + "output.png")
