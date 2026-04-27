@@ -23,6 +23,26 @@ def login():
     return render_template('login.html', title='Авторизация', form=form)
 
 
+@app.route('/play_level1')
+def play_level1():
+    pass
+
+
+@app.route('/play_level2')
+def play_level1():
+    pass
+
+
+@app.route('/play_level3')
+def play_level1():
+    pass
+
+
+@app.route('/create')
+def create():
+    pass
+
+
 def main():
     app.run()
 
