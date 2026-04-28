@@ -3,6 +3,6 @@
 {% block content %}
     <h1>Играть</h1>
     {%for i in counters%}
-        <a class="btn btn-primary" href="/play_level/{{i}}" role="button">Уровень {{i}}</a>
+        <a class="btn btn-primary" href="/play_level{{i}}" role="button">Уровень {{i}}</a>
     {%endfor%}
 {% endblock %}
