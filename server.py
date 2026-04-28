@@ -22,7 +22,7 @@ def load_user(user_id):
 @app.route("/")
 @app.route("/index")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", counters=list(range(1, 4)))
 
 
 @app.route("/register", methods=['GET', 'POST'])
