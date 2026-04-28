@@ -7,6 +7,8 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from flask_restful import abort
 import uuid
 import json
+import os
+from pathlib import Path
 
 
 app = Flask(__name__)
@@ -16,28 +18,46 @@ login_manager.init_app(app)
 
 
 def get_default_slots():
-    return {
+    static_folder = Path('static/images')
+    
+    if not static_folder.exists():
+        print(f"❌ Папка не найдена: {static_folder.absolute()}")
+        print(f"Текущая директория: {os.getcwd()}")
+    
+    # Вариант 1: Если файлы точно есть в static/images/
+    slots = {
         'slot1': {
             'id': 'img1',
-            'url': 'https://picsum.photos/id/101/200/150',  # случайное изображение
-            'title': 'Пейзаж 1'
+            'url': '/static/images/image1.png',  # Убедитесь, что файл существует
+            'title': 'Моя картинка 1'
         },
         'slot2': {
             'id': 'img2',
-            'url': 'https://picsum.photos/id/104/200/150',
-            'title': 'Пейзаж 2'
+            'url': '/static/images/image2.png',
+            'title': 'Моя картинка 2'
         },
         'slot3': {
             'id': 'img3',
-            'url': 'https://picsum.photos/id/107/200/150',
-            'title': 'Пейзаж 3'
+            'url': '/static/images/image3.png',
+            'title': 'Моя картинка 3'
         },
         'slot4': {
             'id': 'img4',
-            'url': 'https://picsum.photos/id/116/200/150',
-            'title': 'Пейзаж 4'
+            'url': '/static/images/image4.png',
+            'title': 'Моя картинка 4'
         }
     }
+    
+    # Проверяем каждый файл
+    for slot, data in slots.items():
+        file_path = data['url'].replace('/static/', 'static/')
+        if os.path.exists(file_path):
+            print(f"✅ {slot}: {file_path} - найден")
+        else:
+            print(f"❌ {slot}: {file_path} - НЕ НАЙДЕН!")
+            print(f"   Ищем в: {os.path.abspath(file_path)}")
+    
+    return slots
 
 
 @app.route('/update_positions', methods=['POST'])
