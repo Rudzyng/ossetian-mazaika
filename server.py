@@ -80,13 +80,13 @@ def play_level1():
 @app.route('/play_level2')
 @login_required
 def play_level2():
-    return render_template("base.html")
+    return render_template("playlevel.html")
 
 
 @app.route('/play_level3')
 @login_required
 def play_level3():
-    return render_template("base.html")
+    return render_template("playlevel.html")
 
 
 @app.route('/create')
