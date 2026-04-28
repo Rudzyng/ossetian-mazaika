@@ -5,79 +5,12 @@ from data.User import User
 from data import db_session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_restful import abort
-import uuid
-import json
-import os
-from pathlib import Path
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
-
-
-def get_default_slots():
-    static_folder = Path('static/images')
-    
-    if not static_folder.exists():
-        print(f"❌ Папка не найдена: {static_folder.absolute()}")
-        print(f"Текущая директория: {os.getcwd()}")
-    
-    # Вариант 1: Если файлы точно есть в static/images/
-    slots = {
-        'slot1': {
-            'id': 'img1',
-            'url': '/static/images/image1.png',  # Убедитесь, что файл существует
-            'title': 'Моя картинка 1'
-        },
-        'slot2': {
-            'id': 'img2',
-            'url': '/static/images/image2.png',
-            'title': 'Моя картинка 2'
-        },
-        'slot3': {
-            'id': 'img3',
-            'url': '/static/images/image3.png',
-            'title': 'Моя картинка 3'
-        },
-        'slot4': {
-            'id': 'img4',
-            'url': '/static/images/image4.png',
-            'title': 'Моя картинка 4'
-        }
-    }
-    
-    # Проверяем каждый файл
-    for slot, data in slots.items():
-        file_path = data['url'].replace('/static/', 'static/')
-        if os.path.exists(file_path):
-            print(f"✅ {slot}: {file_path} - найден")
-        else:
-            print(f"❌ {slot}: {file_path} - НЕ НАЙДЕН!")
-            print(f"   Ищем в: {os.path.abspath(file_path)}")
-    
-    return slots
-
-
-@app.route('/update_positions', methods=['POST'])
-def update_positions():
-    """Обновляет порядок картинок"""
-    data = request.json
-    new_order = data.get('order', {})
-    
-    # Сохраняем новый порядок в сессии
-    session['slots'] = new_order
-    session.modified = True
-    
-    return jsonify({'status': 'success', 'message': 'Позиции обновлены'})
-
-@app.route('/reset', methods=['POST'])
-def reset():
-    """Сбрасывает порядок к начальному"""
-    session['slots'] = get_default_slots()
-    session.modified = True
-    return jsonify({'status': 'success', 'message': 'Сброшено'})
 
 
 @login_manager.user_loader
@@ -141,9 +74,7 @@ def logout():
 @app.route('/play_level1')
 @login_required
 def play_level1():
-    if 'slots' not in session:
-        session['slots'] = get_default_slots()
-    return render_template('playlevel.html', slots=session['slots'])
+    return render_template('playlevel.html')
 
 
 @app.route('/play_level2')
