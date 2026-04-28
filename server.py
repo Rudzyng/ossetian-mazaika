@@ -74,19 +74,19 @@ def logout():
 @app.route('/play_level1')
 @login_required
 def play_level1():
-    return render_template('playlevel.html')
+    return render_template('playlevel1.html')
 
 
 @app.route('/play_level2')
 @login_required
 def play_level2():
-    return render_template("playlevel.html")
+    return render_template("playlevel1.html")
 
 
 @app.route('/play_level3')
 @login_required
 def play_level3():
-    return render_template("playlevel.html")
+    return render_template("playlevel1.html")
 
 
 @app.route('/create')
