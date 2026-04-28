@@ -57,6 +57,13 @@
 </div>
 
 <script>
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
 function allowDrop(ev) {
     ev.preventDefault();
 }
@@ -89,13 +96,12 @@ function drop(ev) {
     targetCell.appendChild(draggedEl);
     if (checkWin()) {
         setTimeout(() => {
-            alert("🎉 Вы выиграли!");
-        }, 100);
-
-        // блокируем перетаскивание
-        document.querySelectorAll("img").forEach(img => {
+            alert("Вы выиграли!");
+            document.querySelectorAll("img").forEach(img => {
             img.setAttribute("draggable", "false");
-        });
+            });
+            window.location.href = "/index";
+        }, 10);
     }
 }
 function getState() {
@@ -124,6 +130,28 @@ function checkWin() {
         win.every((val, i) => val === state[i])
     );
 }
+
+function initGame() {
+    const cells = document.querySelectorAll(".cell");
+    const images = Array.from(document.querySelectorAll("img"));
+
+    let valid = false;
+
+    while (!valid) {
+        shuffle(images);
+
+        cells.forEach((cell, i) => {
+            cell.innerHTML = "";
+            cell.appendChild(images[i]);
+        });
+
+        if (!checkWin()) {
+            valid = true;
+        }
+    }
+}
+
+window.onload = initGame;
 </script>
 
 </body>
