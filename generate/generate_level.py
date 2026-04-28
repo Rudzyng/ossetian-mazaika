@@ -207,6 +207,6 @@ def generate_3(img_width, img_height, image_direct, format, field_direct, final_
 if __name__ == "__main__":
     dict_comp = ["фыркъа", "гæды", "куыдз", "къуда уыры", "хæфс", "тигр", "бæлон", "маймули", "халон", "сæгъ", "арс", "бирæгъ", "рувас", "тæрхъус", "тыртына", "тæхсæл", "пыл", "мыст"]
     generate_2(IMAGE_WIDTH, IMAGE_HEIGHT, DIRECTORY_IMAGES, FORMAT_IMAGE, DIRECTORY_FIELD, DIRECTORY_FINAL_FIELD, dict_comp) # результат в final_field
-    # generate_field("test")
+    generate_field(DIR + "field1", 3, 3)
     # text_on_pic("final_field/1.png", "тигр", (200, 100))
     # generate_3(IMAGE_WIDTH, IMAGE_HEIGHT, DIRECTORY_IMAGES, FORMAT_IMAGE, "field1", "final_field2", dict_comp)
