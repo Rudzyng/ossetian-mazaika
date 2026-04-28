@@ -1,16 +1,63 @@
-from flask import Flask, render_template, redirect, request
+from flask import Flask, render_template, redirect, request, jsonify, session
 from forms.RegisterForm import RegisterForm
 from forms.LoginForm import LoginForm
 from data.User import User
 from data import db_session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_restful import abort
+import uuid
+import json
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+
+def get_default_slots():
+    return {
+        'slot1': {
+            'id': 'img1',
+            'url': 'https://picsum.photos/id/101/200/150',  # случайное изображение
+            'title': 'Пейзаж 1'
+        },
+        'slot2': {
+            'id': 'img2',
+            'url': 'https://picsum.photos/id/104/200/150',
+            'title': 'Пейзаж 2'
+        },
+        'slot3': {
+            'id': 'img3',
+            'url': 'https://picsum.photos/id/107/200/150',
+            'title': 'Пейзаж 3'
+        },
+        'slot4': {
+            'id': 'img4',
+            'url': 'https://picsum.photos/id/116/200/150',
+            'title': 'Пейзаж 4'
+        }
+    }
+
+
+@app.route('/update_positions', methods=['POST'])
+def update_positions():
+    """Обновляет порядок картинок"""
+    data = request.json
+    new_order = data.get('order', {})
+    
+    # Сохраняем новый порядок в сессии
+    session['slots'] = new_order
+    session.modified = True
+    
+    return jsonify({'status': 'success', 'message': 'Позиции обновлены'})
+
+@app.route('/reset', methods=['POST'])
+def reset():
+    """Сбрасывает порядок к начальному"""
+    session['slots'] = get_default_slots()
+    session.modified = True
+    return jsonify({'status': 'success', 'message': 'Сброшено'})
 
 
 @login_manager.user_loader
@@ -74,7 +121,9 @@ def logout():
 @app.route('/play_level1')
 @login_required
 def play_level1():
-    return render_template("base.html")
+    if 'slots' not in session:
+        session['slots'] = get_default_slots()
+    return render_template('playlevel.html', slots=session['slots'])
 
 
 @app.route('/play_level2')

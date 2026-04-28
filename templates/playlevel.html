@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drag-and-Drop Галерея</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Перемещай картинки</h1>
+        <p class="subtitle">Перетащи картинки мышкой, чтобы изменить их порядок</p>
+        
+        <div class="gallery" id="gallery">
+            {% for slot_name, image in slots.items() %}
+            <div class="gallery-item" 
+                 data-id="{{ image.id }}" 
+                 data-slot="{{ slot_name }}"
+                 draggable="true">
+                <div class="image-wrapper">
+                    <img src="{{ image.url }}" alt="{{ image.title }}">
+                    <div class="drag-handle">⋮⋮</div>
+                </div>
+                <div class="image-title">{{ image.title }}</div>
+                <div class="slot-label">Слот {{ loop.index }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="controls">
+            <button class="btn btn-reset" id="resetBtn">🔄 Сбросить порядок</button>
+            <button class="btn btn-save" id="saveBtn">💾 Сохранить порядок</button>
+        </div>
+        
+        <div class="info">
+            <p>✨ Просто перетащи картинку в другое место</p>
+        </div>
+    </div>
+    
+    <script>
+        let draggedItem = null;
+        let dragOverItem = null;
+        
+        const gallery = document.getElementById('gallery');
+        const resetBtn = document.getElementById('resetBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        
+        // Получаем все элементы галереи
+        const getItems = () => {
+            return Array.from(document.querySelectorAll('.gallery-item'));
+        };
+        
+        // Обновляем порядок в DOM
+        function reorderItems(dragged, target) {
+            const draggedIndex = getItems().indexOf(dragged);
+            const targetIndex = getItems().indexOf(target);
+            
+            if (draggedIndex < targetIndex) {
+                target.insertAdjacentElement('afterend', dragged);
+            } else {
+                target.insertAdjacentElement('beforebegin', dragged);
+            }
+        }
+        
+        // Получаем текущий порядок слотов
+        function getCurrentOrder() {
+            const items = getItems();
+            const order = {};
+            
+            items.forEach((item, index) => {
+                const slotName = `slot${index + 1}`;
+                const oldSlot = item.getAttribute('data-slot');
+                const imageId = item.getAttribute('data-id');
+                
+                // Находим данные картинки
+                const imgElement = item.querySelector('img');
+                const titleElement = item.querySelector('.image-title');
+                
+                order[slotName] = {
+                    id: imageId,
+                    url: imgElement.src,
+                    title: titleElement.textContent
+                };
+            });
+            
+            return order;
+        }
+        
+        // Drag-and-Drop обработчики
+        function dragStart(e) {
+            draggedItem = this;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.innerHTML);
+        }
+        
+        function dragEnd(e) {
+            this.classList.remove('dragging');
+            document.querySelectorAll('.gallery-item').forEach(item => {
+                item.classList.remove('drag-over');
+            });
+            draggedItem = null;
+            dragOverItem = null;
+        }
+        
+        function dragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            
+            const target = this.closest('.gallery-item');
+            if (!target || target === draggedItem) return;
+            
+            dragOverItem = target;
+            
+            // Визуальная индикация
+            document.querySelectorAll('.gallery-item').forEach(item => {
+                item.classList.remove('drag-over');
+            });
+            target.classList.add('drag-over');
+        }
+        
+        function drop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const target = this.closest('.gallery-item');
+            if (!target || !draggedItem || target === draggedItem) return;
+            
+            // Переставляем элементы
+            reorderItems(draggedItem, target);
+            
+            // Обновляем data-slot атрибуты
+            updateSlotAttributes();
+            
+            target.classList.remove('drag-over');
+        }
+        
+        // Обновляем атрибуты слотов после перестановки
+        function updateSlotAttributes() {
+            const items = getItems();
+            items.forEach((item, index) => {
+                item.setAttribute('data-slot', `slot${index + 1}`);
+            });
+        }
+        
+        // Сохраняем порядок на сервере
+        async function saveOrder() {
+            const order = getCurrentOrder();
+            
+            try {
+                const response = await fetch('/update_positions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ order: order })
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showNotification('✅ Порядок сохранен!', 'success');
+                } else {
+                    showNotification('❌ Ошибка при сохранении', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('❌ Ошибка соединения', 'error');
+            }
+        }
+        
+        // Сброс порядка
+        async function resetOrder() {
+            try {
+                const response = await fetch('/reset', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    window.location.reload();
+                } else {
+                    showNotification('❌ Ошибка при сбросе', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('❌ Ошибка соединения', 'error');
+            }
+        }
+        
+        // Показываем уведомление
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 10);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 2000);
+        }
+        
+        // Инициализация drag-and-drop
+        function initDragAndDrop() {
+            const items = getItems();
+            items.forEach(item => {
+                item.addEventListener('dragstart', dragStart);
+                item.addEventListener('dragend', dragEnd);
+                item.addEventListener('dragover', dragOver);
+                item.addEventListener('drop', drop);
+            });
+        }
+        
+        // Кнопки управления
+        resetBtn.addEventListener('click', resetOrder);
+        saveBtn.addEventListener('click', saveOrder);
+        
+        // Запускаем drag-and-drop
+        initDragAndDrop();
+    </script>
+</body>
+</html>
