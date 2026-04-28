@@ -42,17 +42,17 @@
 <h2>Уровень 1</h2>
 
 <div class="grid">
-    <div class="cell" ondrop="drop(event)" ondragover="allowDrop(event)">
-        <img src="{{ url_for('static', filename='images/image1.png') }}" id="img1" draggable="true" ondragstart="drag(event)">
+    <div class="cell" data-pos="0" ondrop="drop(event)" ondragover="allowDrop(event)">
+        <img src="{{ url_for('static', filename='images/image1.png') }}" data-num="1" id="img1" draggable="true" ondragstart="drag(event)">
     </div>
-    <div class="cell" ondrop="drop(event)" ondragover="allowDrop(event)">
-        <img src="{{ url_for('static', filename='images/image2.png') }}" id="img2" draggable="true" ondragstart="drag(event)">
+    <div class="cell" data-pos="1" ondrop="drop(event)" ondragover="allowDrop(event)">
+        <img src="{{ url_for('static', filename='images/image2.png') }}" data-num="2" id="img2" draggable="true" ondragstart="drag(event)">
     </div>
-    <div class="cell" ondrop="drop(event)" ondragover="allowDrop(event)">
-        <img src="{{ url_for('static', filename='images/image3.png') }}" id="img3" draggable="true" ondragstart="drag(event)">
+    <div class="cell" data-pos="2" ondrop="drop(event)" ondragover="allowDrop(event)">
+        <img src="{{ url_for('static', filename='images/image3.png') }}" data-num="3" id="img3" draggable="true" ondragstart="drag(event)">
     </div>
-    <div class="cell" ondrop="drop(event)" ondragover="allowDrop(event)">
-        <img src="{{ url_for('static', filename='images/image4.png') }}" id="img4" draggable="true" ondragstart="drag(event)">
+    <div class="cell" data-pos="3" ondrop="drop(event)" ondragover="allowDrop(event)">
+        <img src="{{ url_for('static', filename='images/image4.png') }}" data-num="4" id="img4" draggable="true" ondragstart="drag(event)">
     </div>
 </div>
 
@@ -87,6 +87,42 @@ function drop(ev) {
     }
 
     targetCell.appendChild(draggedEl);
+    if (checkWin()) {
+        setTimeout(() => {
+            alert("🎉 Вы выиграли!");
+        }, 100);
+
+        // блокируем перетаскивание
+        document.querySelectorAll("img").forEach(img => {
+            img.setAttribute("draggable", "false");
+        });
+    }
+}
+function getState() {
+    const cells = document.querySelectorAll(".cell");
+    let state = [];
+
+    cells.forEach(cell => {
+        const img = cell.querySelector("img");
+        state.push(img ? Number(img.dataset.num) : null);
+    });
+
+    return state;
+}
+
+function checkWin() {
+    const state = getState();
+
+    const winStates = [
+        [1, 2, 3, 4],
+        [2, 1, 4, 3],
+        [3, 4, 1, 2],
+        [4, 3, 2, 1]
+    ];
+
+    return winStates.some(win =>
+        win.every((val, i) => val === state[i])
+    );
 }
 </script>
 
