@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>3x3 Puzzle</title>
+
+<style>
+body {
+    font-family: Arial;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 150px);
+    grid-template-rows: repeat(3, 150px);
+    gap: 10px;
+    margin-top: 40px;
+}
+
+.cell {
+    border: 2px dashed #aaa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.cell img {
+    max-width: 100%;
+    max-height: 100%;
+    cursor: grab;
+}
+</style>
+</head>
+
+<body>
+
+<h2>3×3 пазл</h2>
+
+<div class="grid">
+    <div class="cell" data-pos="0" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+    <div class="cell" data-pos="1" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+    <div class="cell" data-pos="2" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+
+    <div class="cell" data-pos="3" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+    <div class="cell" data-pos="4" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+    <div class="cell" data-pos="5" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+
+    <div class="cell" data-pos="6" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+    <div class="cell" data-pos="7" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+    <div class="cell" data-pos="8" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+</div>
+
+<!-- картинки -->
+<div style="display:none;">
+    <img src="{{ url_for('static', filename='img1.jpg') }}" data-num="1" id="img1" draggable="true" ondragstart="drag(event)">
+    <img src="{{ url_for('static', filename='img2.jpg') }}" data-num="2" id="img2" draggable="true" ondragstart="drag(event)">
+    <img src="{{ url_for('static', filename='img3.jpg') }}" data-num="3" id="img3" draggable="true" ondragstart="drag(event)">
+    <img src="{{ url_for('static', filename='img4.jpg') }}" data-num="4" id="img4" draggable="true" ondragstart="drag(event)">
+    <img src="{{ url_for('static', filename='img5.jpg') }}" data-num="5" id="img5" draggable="true" ondragstart="drag(event)">
+    <img src="{{ url_for('static', filename='img6.jpg') }}" data-num="6" id="img6" draggable="true" ondragstart="drag(event)">
+    <img src="{{ url_for('static', filename='img7.jpg') }}" data-num="7" id="img7" draggable="true" ondragstart="drag(event)">
+    <img src="{{ url_for('static', filename='img8.jpg') }}" data-num="8" id="img8" draggable="true" ondragstart="drag(event)">
+    <img src="{{ url_for('static', filename='img9.jpg') }}" data-num="9" id="img9" draggable="true" ondragstart="drag(event)">
+</div>
+
+<script>
+function allowDrop(ev) {
+    ev.preventDefault();
+}
+
+function drag(ev) {
+    ev.dataTransfer.setData("id", ev.target.id);
+}
+
+function drop(ev) {
+    ev.preventDefault();
+
+    const draggedId = ev.dataTransfer.getData("id");
+    const dragged = document.getElementById(draggedId);
+
+    let target = ev.target;
+    if (target.tagName === "IMG") {
+        target = target.parentNode;
+    }
+
+    const existing = target.querySelector("img");
+
+    if (existing) {
+        const parent = dragged.parentNode;
+        parent.appendChild(existing);
+    }
+
+    target.appendChild(dragged);
+
+    if (checkWin()) {
+        setTimeout(() => {
+            alert("🎉 Победа!");
+
+            document.querySelectorAll("img").forEach(img => {
+                img.draggable = false;
+            });
+
+            setTimeout(() => {
+                window.location.href = "/begin";
+            }, 1500);
+
+        }, 100);
+    }
+}
+
+// состояние
+function getState() {
+    const cells = document.querySelectorAll(".cell");
+    return Array.from(cells).map(cell => {
+        const img = cell.querySelector("img");
+        return img ? Number(img.dataset.num) : null;
+    });
+}
+
+// выигрышные варианты (по аналогии с 2x2)
+function checkWin() {
+    const state = getState();
+
+    const wins = [
+        [1,2,3,4,5,6,7,8,9],
+        [3,2,1,6,5,4,9,8,7],
+        [7,8,9,4,5,6,1,2,3],
+        [9,8,7,6,5,4,3,2,1]
+    ];
+
+    return wins.some(w =>
+        w.every((val, i) => val === state[i])
+    );
+}
+
+// перемешивание
+function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+}
+
+// старт игры
+function initGame() {
+    const cells = document.querySelectorAll(".cell");
+    const images = Array.from(document.querySelectorAll("img"));
+
+    let ok = false;
+
+    while (!ok) {
+        shuffle(images);
+
+        cells.forEach((cell, i) => {
+            cell.innerHTML = "";
+            cell.appendChild(images[i]);
+        });
+
+        if (!checkWin()) {
+            ok = true;
+        }
+    }
+}
+
+window.onload = initGame;
+</script>
+
+</body>
+</html>
