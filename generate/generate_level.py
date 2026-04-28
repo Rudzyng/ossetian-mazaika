@@ -117,7 +117,7 @@ def generate_3(img_width, img_height, image_direct, format, field_direct, final_
     count_text = 0
     font = ImageFont.truetype(DIR + "fonts/candara.ttf", 56)
     for i in range(9):
-        for j in range(2):
+        for j in range(len(pairs[i])):
             x, y = pairs[i][j]
             field_text[x][y] = comp[count_text]
             count_text += 1
@@ -125,28 +125,81 @@ def generate_3(img_width, img_height, image_direct, format, field_direct, final_
     counter_img = 1
     for i in range(9):
         background = Image.open(DIR + f"{field_direct}/{i + 1}{format}")
-        overlay1 = Image.open(DIR + f"{image_direct}/{counter_img}{format}")
-        rotated1 = overlay1.rotate(rotations[indexes_images[i][0]])
-        background.paste(rotated1, coords_for_image[indexes_images[i][0]], rotated1)
-        counter_img += 1
+        if len(indexes_images[i] == 2):
+            overlay1 = Image.open(DIR + f"{image_direct}/{counter_img}{format}")
+            rotated1 = overlay1.rotate(rotations[indexes_images[i][0]])
+            background.paste(rotated1, coords_for_image[indexes_images[i][0]], rotated1)
+            counter_img += 1
 
-        overlay2 = Image.open(DIR + f"{image_direct}/{counter_img}{format}")
-        rotated2 = overlay2.rotate(rotations[indexes_images[i][1]])
-        background.paste(rotated2, coords_for_image[indexes_images[i][1]], rotated2)
-        counter_img += 1
+            overlay2 = Image.open(DIR + f"{image_direct}/{counter_img}{format}")
+            rotated2 = overlay2.rotate(rotations[indexes_images[i][1]])
+            background.paste(rotated2, coords_for_image[indexes_images[i][1]], rotated2)
+            counter_img += 1
 
-        y_coord = 100
-        text1 = field_text[i][indexes_text[i][0]]
-        background = background.rotate(rotations[indexes_text[i][0]])
-        add_centered_text(background, text1, background.width // 2, y_coord, font)
-        background = background.rotate(-rotations[indexes_text[i][0]])
+            y_coord = 100
+            text1 = field_text[i][indexes_text[i][0]]
+            background = background.rotate(rotations[indexes_text[i][0]])
+            if indexes_text[i][1] == 3:
+                y_coord = 500
+            add_centered_text(background, text1, background.width // 2, y_coord, font)
+            background = background.rotate(-rotations[indexes_text[i][0]])
 
-        text2 = field_text[i][indexes_text[i][1]]
-        background = background.rotate(rotations[indexes_text[i][1]])
-        if indexes_text[i][1] == 3:
-            y_coord = 500
-        add_centered_text(background, text2, background.width // 2, y_coord, font)
-        background = background.rotate(-rotations[indexes_text[i][1]])
+            text2 = field_text[i][indexes_text[i][1]]
+            background = background.rotate(rotations[indexes_text[i][1]])
+            if indexes_text[i][1] == 3:
+                y_coord = 500
+            add_centered_text(background, text2, background.width // 2, y_coord, font)
+            background = background.rotate(-rotations[indexes_text[i][1]])
+        elif len(indexes_images[i] == 1):
+            overlay1 = Image.open(DIR + f"{image_direct}/{counter_img}{format}")
+            rotated1 = overlay1.rotate(rotations[indexes_images[i][0]])
+            background.paste(rotated1, coords_for_image[indexes_images[i][0]], rotated1)
+            counter_img += 1
+
+            y_coord = 100
+            text1 = field_text[i][indexes_text[i][0]]
+            background = background.rotate(rotations[indexes_text[i][0]])
+            if indexes_text[i][1] == 3:
+                y_coord = 500
+            add_centered_text(background, text1, background.width // 2, y_coord, font)
+            background = background.rotate(-rotations[indexes_text[i][0]])
+
+            text2 = field_text[i][indexes_text[i][1]]
+            background = background.rotate(rotations[indexes_text[i][1]])
+            if indexes_text[i][1] == 3:
+                y_coord = 500
+            add_centered_text(background, text2, background.width // 2, y_coord, font)
+            background = background.rotate(-rotations[indexes_text[i][1]])
+
+            text3 = field_text[i][indexes_text[i][2]]
+            background = background.rotate(rotations[indexes_text[i][2]])
+            if indexes_text[i][2] == 3:
+                y_coord = 500
+            add_centered_text(background, text3, background.width // 2, y_coord, font)
+            background = background.rotate(-rotations[indexes_text[i][1]])
+        else:
+            overlay1 = Image.open(DIR + f"{image_direct}/{counter_img}{format}")
+            rotated1 = overlay1.rotate(rotations[indexes_images[i][0]])
+            background.paste(rotated1, coords_for_image[indexes_images[i][0]], rotated1)
+            counter_img += 1
+
+            overlay2 = Image.open(DIR + f"{image_direct}/{counter_img}{format}")
+            rotated2 = overlay2.rotate(rotations[indexes_images[i][1]])
+            background.paste(rotated2, coords_for_image[indexes_images[i][1]], rotated2)
+            counter_img += 1
+
+            overlay3 = Image.open(DIR + f"{image_direct}/{counter_img}{format}")
+            rotated3 = overlay3.rotate(rotations[indexes_images[i][2]])
+            background.paste(rotated3, coords_for_image[indexes_images[i][2]], rotated3)
+            counter_img += 1
+
+            y_coord = 100
+            text1 = field_text[i][indexes_text[i][0]]
+            background = background.rotate(rotations[indexes_text[i][0]])
+            if indexes_text[i][1] == 3:
+                y_coord = 500
+            add_centered_text(background, text1, background.width // 2, y_coord, font)
+            background = background.rotate(-rotations[indexes_text[i][0]])
 
         background.save(DIR + f'{final_direct}/{i + 1}{format}')
 
