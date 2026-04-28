@@ -108,8 +108,8 @@ def generate_3(img_width, img_height, image_direct, format, field_direct, final_
     #    3
     rotations = [-90, 0, 90, 0]
     coords_for_image = [(0, img_height), (img_width, 0), (2 * img_width, img_height), (img_width, img_height * 2)]
-    indexes_images = [(0, 2), (1, 3), (0, 1), (1, 3), (0, 2), (1, 2), (0, 2, 3), (1, 2), (1)]
-    indexes_text = [(1, 3), (0, 2), (2, 3), (0, 2), (1, 3), (0, 3), (1), (0, 3), (0, 2, 3)]
+    indexes_images = [(0, 2), (1, 3), (0, 1), (1, 3), (0, 2), (1, 2), (0, 2, 3), (1, 2), (1,)]
+    indexes_text = [(1, 3), (0, 2), (2, 3), (0, 2), (1, 3), (0, 3), (1,), (0, 3), (0, 2, 3)]
     pairs = [[(2, 2), (1, 0)], [(7, 3), (4, 1)], [(1, 2), (8, 3)], [(0, 3), (6, 1)]]
     pairs += [[(3, 2), (5, 0)], [(2, 3), (3, 0)], [(8, 2), (7, 0), (0, 1)], [(4, 3), (8, 0)], [(5, 3)]]
     field_text = [["", "", "", ""] for _ in range(9)]
@@ -125,7 +125,7 @@ def generate_3(img_width, img_height, image_direct, format, field_direct, final_
     counter_img = 1
     for i in range(9):
         background = Image.open(DIR + f"{field_direct}/{i + 1}{format}")
-        if len(indexes_images[i] == 2):
+        if len(indexes_images[i]) == 2:
             overlay1 = Image.open(DIR + f"{image_direct}/{counter_img}{format}")
             rotated1 = overlay1.rotate(rotations[indexes_images[i][0]])
             background.paste(rotated1, coords_for_image[indexes_images[i][0]], rotated1)
@@ -139,7 +139,7 @@ def generate_3(img_width, img_height, image_direct, format, field_direct, final_
             y_coord = 100
             text1 = field_text[i][indexes_text[i][0]]
             background = background.rotate(rotations[indexes_text[i][0]])
-            if indexes_text[i][1] == 3:
+            if indexes_text[i][0] == 3:
                 y_coord = 500
             add_centered_text(background, text1, background.width // 2, y_coord, font)
             background = background.rotate(-rotations[indexes_text[i][0]])
@@ -150,7 +150,7 @@ def generate_3(img_width, img_height, image_direct, format, field_direct, final_
                 y_coord = 500
             add_centered_text(background, text2, background.width // 2, y_coord, font)
             background = background.rotate(-rotations[indexes_text[i][1]])
-        elif len(indexes_images[i] == 1):
+        elif len(indexes_images[i]) == 1:
             overlay1 = Image.open(DIR + f"{image_direct}/{counter_img}{format}")
             rotated1 = overlay1.rotate(rotations[indexes_images[i][0]])
             background.paste(rotated1, coords_for_image[indexes_images[i][0]], rotated1)
@@ -159,7 +159,7 @@ def generate_3(img_width, img_height, image_direct, format, field_direct, final_
             y_coord = 100
             text1 = field_text[i][indexes_text[i][0]]
             background = background.rotate(rotations[indexes_text[i][0]])
-            if indexes_text[i][1] == 3:
+            if indexes_text[i][0] == 3:
                 y_coord = 500
             add_centered_text(background, text1, background.width // 2, y_coord, font)
             background = background.rotate(-rotations[indexes_text[i][0]])
@@ -196,7 +196,7 @@ def generate_3(img_width, img_height, image_direct, format, field_direct, final_
             y_coord = 100
             text1 = field_text[i][indexes_text[i][0]]
             background = background.rotate(rotations[indexes_text[i][0]])
-            if indexes_text[i][1] == 3:
+            if indexes_text[i][0] == 3:
                 y_coord = 500
             add_centered_text(background, text1, background.width // 2, y_coord, font)
             background = background.rotate(-rotations[indexes_text[i][0]])
@@ -207,6 +207,6 @@ def generate_3(img_width, img_height, image_direct, format, field_direct, final_
 if __name__ == "__main__":
     dict_comp = ["фыркъа", "гæды", "куыдз", "къуда уыры", "хæфс", "тигр", "бæлон", "маймули", "халон", "сæгъ", "арс", "бирæгъ", "рувас", "тæрхъус", "тыртына", "тæхсæл", "пыл", "мыст"]
     generate_2(IMAGE_WIDTH, IMAGE_HEIGHT, DIRECTORY_IMAGES, FORMAT_IMAGE, DIRECTORY_FIELD, DIRECTORY_FINAL_FIELD, dict_comp) # результат в final_field
-    generate_field(DIR + "field1", 3, 3)
+    # generate_field(DIR + "field1", 3, 3)
     # text_on_pic("final_field/1.png", "тигр", (200, 100))
-    # generate_3(IMAGE_WIDTH, IMAGE_HEIGHT, DIRECTORY_IMAGES, FORMAT_IMAGE, "field1", "final_field2", dict_comp)
+    generate_3(IMAGE_WIDTH, IMAGE_HEIGHT, DIRECTORY_IMAGES, FORMAT_IMAGE, "field1", "final_field2", dict_comp)
