@@ -62,7 +62,7 @@ def generate_2(img_width, img_height, image_direct, format, field_direct, final_
     indexes_images = [(0, 2), (1, 3), (1, 3), (0, 2)]
     indexes_text = [(1, 3), (0, 2), (0, 2), (1, 3)]
     pairs = [[(1, 2), (1, 0)], [(3, 3), (3, 1)], [(0, 3), (0, 1)], [(2, 2), (2, 0)]]
-    field_text = [["", "", "", ""] for x in range(4)]
+    field_text = [["", "", "", ""] for _ in range(4)]
 
     count_text = 0
     font = ImageFont.truetype(DIR + "fonts/candara.ttf", 56)
@@ -111,7 +111,7 @@ def generate_3(img_width, img_height, image_direct, format, field_direct, final_
     indexes_images = [(0, 2), (1, 3), (0, 1), (1, 3), (0, 2), (1, 2), (0, 2, 3), (1, 2), (1)]
     indexes_text = [(1, 3), (0, 2), (2, 3), (0, 2), (1, 3), (0, 3), (1), (0, 3), (0, 2, 3)]
     pairs = [[(1, 2), (1, 0)], [(3, 3), (3, 1)], [(0, 3), (0, 1)], [(2, 2), (2, 0)]]
-    field_text = [["", "", "", ""] for x in range(9)]
+    field_text = [["", "", "", ""] for _ in range(9)]
 
     count_text = 0
     font = ImageFont.truetype(DIR + "fonts/candara.ttf", 56)
