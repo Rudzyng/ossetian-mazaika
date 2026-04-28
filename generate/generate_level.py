@@ -110,7 +110,8 @@ def generate_3(img_width, img_height, image_direct, format, field_direct, final_
     coords_for_image = [(0, img_height), (img_width, 0), (2 * img_width, img_height), (img_width, img_height * 2)]
     indexes_images = [(0, 2), (1, 3), (0, 1), (1, 3), (0, 2), (1, 2), (0, 2, 3), (1, 2), (1)]
     indexes_text = [(1, 3), (0, 2), (2, 3), (0, 2), (1, 3), (0, 3), (1), (0, 3), (0, 2, 3)]
-    pairs = [[(1, 2), (1, 0)], [(3, 3), (3, 1)], [(0, 3), (0, 1)], [(2, 2), (2, 0)]]
+    pairs = [[(2, 2), (1, 0)], [(7, 3), (4, 1)], [(1, 2), (8, 3)], [(0, 3), (6, 1)]]
+    pairs += [[(3, 2), (5, 0)], [(2, 3), (3, 0)], [(8, 2), (7, 0), (0, 1)], [(4, 3), (8, 0)], [(5, 3)]]
     field_text = [["", "", "", ""] for _ in range(9)]
 
     count_text = 0
