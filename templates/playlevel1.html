@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Уровень</title>
+    <title>Уровень 1</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -80,7 +80,6 @@ function drop(ev) {
 
     let targetCell = ev.target;
 
-    // если кинули на картинку — берем её контейнер
     if (targetCell.tagName === "IMG") {
         targetCell = targetCell.parentNode;
     }
@@ -88,7 +87,6 @@ function drop(ev) {
     const existingImg = targetCell.querySelector("img");
 
     if (existingImg) {
-        // меняем местами
         const originCell = draggedEl.parentNode;
         originCell.appendChild(existingImg);
     }
