@@ -176,7 +176,7 @@ def generate_3(img_width, img_height, image_direct, format, field_direct, final_
             if indexes_text[i][2] == 3:
                 y_coord = 500
             add_centered_text(background, text3, background.width // 2, y_coord, font)
-            background = background.rotate(-rotations[indexes_text[i][1]])
+            background = background.rotate(-rotations[indexes_text[i][2]])
         else:
             overlay1 = Image.open(DIR + f"{image_direct}/{counter_img}{format}")
             rotated1 = overlay1.rotate(rotations[indexes_images[i][0]])
