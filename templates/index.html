@@ -1,9 +1,107 @@
-{% extends "base.html" %}
 
-{% block content %}
+
+<!--
     <h1>Играть</h1>
     {%for i in counters%}
         <a class="btn btn-primary" href="/play_level{{i}}" role="button">Уровень {{i}}</a>
     {%endfor%}
-    <a class="btn btn-primary" href="/create" role="button">Создавать</a>
+    <a class="btn btn-primary" href="/create" role="button">Создавать</a> -->
+{% extends "base.html" %}
+
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<style>
+    button,
+    .link-button {
+      width: 100%;
+      border: 1px solid gray;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      background-color: white;
+      cursor: pointer;
+      transition:
+        background-color 0.3s,
+        color 0.3s;
+      font-size: 16px;
+    }
+
+    button:hover,
+    .link-button:hover {
+      background-color: #f0f0f0;
+      color: #333;
+    }
+    
+    /* Адаптация под размер телефона */
+    h1 {
+      font-size: 1.5rem !important;
+      padding: 0.75rem !important;
+      margin-top: 0.5rem !important;
+    }
+    
+    h2 {
+      font-size: 1.1rem !important;
+    }
+    
+    .buttons-container {
+      width: 90% !important;
+      max-width: 350px !important;
+      margin: 0 auto !important;
+      padding: 1rem !important;
+    }
+    
+    input {
+      font-size: 16px !important;
+      padding: 0.75rem !important;
+    }
+    
+    .points-text {
+      font-size: 1rem !important;
+      padding: 0.75rem !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 class="text-center font-bold">
+  Веб-приложение для демонстрации<br>базовой работы с рудзынг API
+</h1>
+
+<section class="flex flex-col gap-4 justify-center items-center mt-6 w-full px-4">
+  <h2 class="text-center font-bold">
+    Кнопки, реализующие работу с API
+  </h2>
+
+  <div class="buttons-container flex flex-col gap-3">
+    {% if not user_id %}
+    <a class="link-button text-center" href="/login">Авторизация в рудзынг.рф</a>
+    {% endif %}
+
+    {% if user_id %}
+    <form action="/points" method="get">
+      <input type="hidden" value="get" name="action" />
+      <button id="get-points" type="submit">Получить баллы</button>
+    </form>
+    <form action="/points" method="post" class="flex flex-col gap-2">
+      <input type="hidden" value="add" name="action" />
+      <input type="number" name="points" placeholder="Баллы" required class="border-2 border-gray-300 rounded" />
+      <button id="post-points" type="submit">Добавить баллы пользователю</button>
+    </form>
+    <a href="/logout" class="link-button text-center bg-red-500! text-white hover:bg-red-600! hover:text-white! border-none">
+      Выйти
+    </a>
+    {% endif %}
+  </div>
+</section>
+
+{% if points %}
+<div class="mt-4 px-4">
+  <h2 class="points-text text-green-500 text-center font-semibold">Баллы пользователя: {{ points }}</h2>
+</div>
+{% endif %}
+
+{% if error %}
+<div class="mt-4 px-4">
+  <h2 class="points-text text-red-500 text-center">{{ error["message"] }}</h2>
+</div>
+{% endif %}
 {% endblock %}

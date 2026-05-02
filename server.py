@@ -6,6 +6,11 @@ from data import db_session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_restful import abort
 
+from constants import APP_SECRET_KEY
+from utils.get_points import get_points
+from utils.post_points import post_points
+from utils.login import login as API_login
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -22,7 +27,11 @@ def load_user(user_id):
 @app.route("/")
 @app.route("/index")
 def index():
-    return render_template("index.html", counters=list(range(1, 4)))
+    user_id = session.get("user_id", None)
+    user_points = session.get("user_points", None)
+    error = session.get("error")
+
+    return render_template("index.html", user_id=user_id, points=user_points, error=error)
 
 
 @app.route("/register", methods=['GET', 'POST'])
