@@ -6,7 +6,6 @@ from data import db_session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_restful import abort
 
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
