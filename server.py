@@ -85,32 +85,29 @@ def login():
 
 
 @app.route('/logout')
-@login_required
 def logout():
-    logout_user()
-    return redirect("/")
+    session.pop("user_id", None)
+    session.pop("user_points", None)
+
+    return render_template("index.html")
 
 
 @app.route('/play_level1')
-@login_required
 def play_level1():
     return render_template('playlevel1.html')
 
 
 @app.route('/play_level2')
-@login_required
 def play_level2():
     return render_template("playlevel2.html")
 
 
 @app.route('/play_level3')
-@login_required
 def play_level3():
     return render_template("playlevel1.html")
 
 
 @app.route('/create')
-@login_required
 def create():
     return render_template("base.html")
 
