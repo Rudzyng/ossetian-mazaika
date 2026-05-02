@@ -102,11 +102,6 @@ def play_level2():
     return render_template("playlevel2.html")
 
 
-@app.route('/play_level3')
-def play_level3():
-    return render_template("playlevel1.html")
-
-
 @app.route('/create')
 def create():
     return render_template("base.html")
