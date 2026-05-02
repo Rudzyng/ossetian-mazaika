@@ -32,7 +32,7 @@ def index():
     user_points = session.get("user_points", None)
     error = session.get("error")
 
-    return render_template("index.html", user_id=user_id, points=user_points, error=error)
+    return render_template("index.html", user_id=user_id, points=user_points, error=error, counters=list(range(1, 3)))
 
 
 @app.route("/register", methods=['GET', 'POST'])
