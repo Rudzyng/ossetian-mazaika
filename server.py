@@ -112,6 +112,20 @@ def create():
     return render_template("base.html")
 
 
+@app.route("/points", methods=["GET", "POST"])
+def points():
+    if request.method == "GET":
+        session["user_points"] = get_points()
+    elif request.method == "POST":
+        try:
+            points = int(request.form.get("points", 0))
+            session["user_points"] = post_points(points)
+        except Exception as e:
+            session["error"] = e
+        
+    return redirect(url_for("index"))
+
+
 def main():
     app.run()
 
