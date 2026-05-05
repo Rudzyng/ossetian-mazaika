@@ -1,16 +1,5 @@
 from PIL import Image, ImageDraw, ImageFont
-
-IMAGE_HEIGHT = 200
-IMAGE_WIDTH = 200
-WIDTH_FIELD = 2
-HEIGHT_FIELD = 2
-NUMBER_IMAGES = 8
-DIRECTORY_IMAGES = "images_generate"
-FORMAT_IMAGE = ".png"
-SQUARE_WIDTH = IMAGE_HEIGHT * 3
-DIRECTORY_FINAL_FIELD = "final_field"
-DIRECTORY_FIELD = "field"
-DIR = "generate/"
+from generate.constants_generate import *
 
 
 def draw_square(final_file, wid=SQUARE_WIDTH):
