@@ -28,7 +28,6 @@
             color: #333;
         }
 
-        /* Кнопка "На главную" (доступна всегда) */
         .btn-home {
             padding: 8px 16px;
             font-size: 14px;
@@ -92,7 +91,6 @@
         .btn-finish:hover { background: #f57c00; }
         .btn-finish:active { transform: scale(0.98); }
 
-        /* Модальное окно победы */
         .overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -148,7 +146,7 @@
 
 <div class="header-bar">
     <h2>Уровень 1</h2>
-    <button class="btn-home" onclick="goToIndex()">🏠 На главную</button>
+    <button class="btn-home" onclick="goToIndex()">На главную</button>
 </div>
 
 <div class="grid">
@@ -171,7 +169,7 @@
 <!-- Модальное окно победы -->
 <div id="winOverlay" class="overlay">
     <div class="overlay-content">
-        <h3>🎉 Вы выиграли!</h3>
+        <h3>Вы выиграли!</h3>
         <p>Перейти к следующему уровню?</p>
         <button class="btn-continue" onclick="goToNextLevel()">Продолжить</button>
     </div>
@@ -269,9 +267,8 @@ function initGame() {
     }
 }
 
-// Переход на следующую страницу (измените URL на нужный)
 function goToNextLevel() {
-    window.location.href = "/level2"; 
+    window.location.href = "/play_level1"; 
 }
 
 // Переход на главную
