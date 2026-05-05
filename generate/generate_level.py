@@ -19,14 +19,6 @@ def generate_field(final_dir, wid=WIDTH_FIELD, hei=HEIGHT_FIELD, wid_sqr=SQUARE_
         draw_square(f"{final_dir}/{i + 1}.png", wid=wid_sqr)
 
 
-def text_on_pic(picture, text, pos, color=(0, 0, 0), txt_font="arial.ttf", size=36):
-    image = Image.open(picture)
-    draw = ImageDraw.Draw(image)
-    font = ImageFont.truetype(txt_font, size)
-    draw.text(pos, text, font=font, fill=color)
-    image.save('output.png')
-
-
 def add_centered_text(image, text, center_x, center_y, font, color=(0, 0, 0)):
     draw = ImageDraw.Draw(image)
 
