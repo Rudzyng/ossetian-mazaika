@@ -1,5 +1,5 @@
 from PIL import Image, ImageDraw, ImageFont
-from generate.constants_generate import *
+from constants_generate import *
 
 
 def draw_square(final_file, wid=SQUARE_WIDTH):
@@ -12,11 +12,6 @@ def draw_square(final_file, wid=SQUARE_WIDTH):
     draw.line([wid - 1, 0, 0, wid - 1], fill='black', width=2)
 
     img.save(final_file)
-
-
-def generate_field(final_dir, wid=WIDTH_FIELD, hei=HEIGHT_FIELD, wid_sqr=SQUARE_WIDTH):
-    for i in range(wid * hei):
-        draw_square(f"{final_dir}/{i + 1}.png", wid=wid_sqr)
 
 
 def add_centered_text(image, text, center_x, center_y, font, color=(0, 0, 0)):
@@ -33,7 +28,7 @@ def add_centered_text(image, text, center_x, center_y, font, color=(0, 0, 0)):
     return image
 
 
-def generate_2(img_width, img_height, image_direct, format, field_direct, final_direct, comp):
+def generate_2(img_width, img_height, image_direct, path_sq, final_direct, comp, format="png"):
     # нумерация в блоке:
     #    1
     #  0   2
@@ -55,7 +50,7 @@ def generate_2(img_width, img_height, image_direct, format, field_direct, final_
 
     counter_img = 1
     for i in range(4):
-        background = Image.open(DIR + f"{field_direct}/{i + 1}{format}")
+        background = Image.open(DIR + path_sq)
         overlay1 = Image.open(DIR + f"{image_direct}/{counter_img}{format}")
         rotated1 = overlay1.rotate(rotations[indexes_images[i][0]])
         background.paste(rotated1, coords_for_image[indexes_images[i][0]], rotated1)
@@ -82,7 +77,7 @@ def generate_2(img_width, img_height, image_direct, format, field_direct, final_
         background.save(DIR + f'{final_direct}/{i + 1}{format}')
 
 
-def generate_3(img_width, img_height, image_direct, format, field_direct, final_direct, comp):
+def generate_3(img_width, img_height, image_direct, path_sq, final_direct, comp, format="png"):
     # нумерация в блоке:
     #    1
     #  0   2
@@ -105,7 +100,7 @@ def generate_3(img_width, img_height, image_direct, format, field_direct, final_
 
     counter_img = 1
     for i in range(9):
-        background = Image.open(DIR + f"{field_direct}/{i + 1}{format}")
+        background = Image.open(DIR + path_sq)
         if len(indexes_images[i]) == 2:
             overlay1 = Image.open(DIR + f"{image_direct}/{counter_img}{format}")
             rotated1 = overlay1.rotate(rotations[indexes_images[i][0]])
@@ -187,7 +182,6 @@ def generate_3(img_width, img_height, image_direct, format, field_direct, final_
 
 if __name__ == "__main__":
     dict_comp = ["фыркъа", "гæды", "куыдз", "къуда уыры", "хæфс", "тигр", "бæлон", "маймули", "халон", "сæгъ", "арс", "бирæгъ", "рувас", "тæрхъус", "тыртына", "тæхсæл", "пыл", "мыст"]
-    generate_2(IMAGE_WIDTH, IMAGE_HEIGHT, DIRECTORY_IMAGES, FORMAT_IMAGE, DIRECTORY_FIELD, DIRECTORY_FINAL_FIELD, dict_comp) # результат в final_field
-    # generate_field(DIR + "field1", 3, 3)
-    # text_on_pic("final_field/1.png", "тигр", (200, 100))
-    generate_3(IMAGE_WIDTH, IMAGE_HEIGHT, DIRECTORY_IMAGES, FORMAT_IMAGE, "field1", "final_field2", dict_comp)
+    # draw_square(DIR + "square.png")
+    generate_2(IMAGE_WIDTH, IMAGE_HEIGHT, DIRECTORY_IMAGES, "square.png", DIRECTORY_FINAL_FIELD, dict_comp, format=FORMAT_IMAGE) # результат в final_field
+    generate_3(IMAGE_WIDTH, IMAGE_HEIGHT, DIRECTORY_IMAGES, "square.png", "final_field2", dict_comp, format=FORMAT_IMAGE)
