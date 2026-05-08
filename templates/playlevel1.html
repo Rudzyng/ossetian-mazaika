@@ -1,90 +1,116 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Уровень 1</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f8f9fa;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .puzzle-wrapper {
-            background: #e9ecef;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            display: inline-grid;
-            justify-items: center;
-            align-items: center;
-            width: fit-content;
-        }
+{% extends "base.html" %}
 
-        .puzzle-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 200px);
-            grid-template-rows: repeat(2, 200px);
-            gap: 15px;
-        }
+{% block head %}
+{{ super() }}
+<title>Уровень 1</title>
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
 
-        .cell {
-            border: 2px dashed #adb5bd;
-            background: #fff;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-        }
+<style>
+    .puzzle-wrapper {
+        background: #e9ecef;
+        padding: 15px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+    }
 
-        .cell img {
-            max-width: 100%;
-            max-height: 100%;
-            cursor: grab;
-            border-radius: 4px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-            user-select: none;
-        }
+    .puzzle-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 180px);
+        grid-template-rows: repeat(2, 180px);
+        gap: 12px;
+    }
 
-        .cell img:active {
-            cursor: grabbing;
-        }
+    .cell {
+        border: 2px dashed #adb5bd;
+        background: #fff;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+    }
 
-        .timer-display {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #495057;
-            background: #fff;
-            padding: 8px 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            min-width: 120px;
-        }
-        .timer-display.finished {
-            color: #198754;
-            background: #d1e7dd;
-        }
-    </style>
-</head>
-<body>
+    .cell img {
+        max-width: 100%;
+        max-height: 100%;
+        cursor: grab;
+        border-radius: 4px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        user-select: none;
+    }
 
-<div class="container text-center mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4" style="max-width: 440px; margin: 0 auto;">
-        <h2 class="mb-0">Уровень 1</h2>
-        <div class="d-flex align-items-center gap-2">
+    .cell img:active {
+        cursor: grabbing;
+    }
+
+    .timer-display {
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #495057;
+        background: #fff;
+        padding: 6px 16px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        min-width: 100px;
+        text-align: center;
+    }
+    .timer-display.finished {
+        color: #198754;
+        background: #d1e7dd;
+    }
+
+    .btn-home {
+        margin-left: 8px;
+    }
+    .btn-finish {
+        margin-top: 15px;
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .level-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding: 0 5px;
+    }
+    .level-title {
+        font-size: 1.4rem;
+        font-weight: bold;
+        color: #333;
+        margin: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column align-items-center">
+    
+    <!-- Шапка с таймером -->
+    <div class="level-header w-100">
+        <h2 class="level-title">Уровень 1</h2>
+        <div class="d-flex align-items-center">
             <span id="timer" class="timer-display">00:00</span>
-            <button id="btnHome" class="btn btn-outline-secondary" onclick="goToIndex()" style="display: none;">
-                На главную
+            <button id="btnHome" class="btn btn-outline-secondary btn-sm btn-home" onclick="goToIndex()" style="display: none;">
+                🏠
             </button>
         </div>
     </div>
 
-    <div class="puzzle-wrapper mx-auto d-flex justify-content-center">
+    <div class="puzzle-wrapper">
         <div class="puzzle-grid">
             <div class="cell" data-pos="0" ondrop="drop(event)" ondragover="allowDrop(event)">
                 <img src="{{ url_for('static', filename='images/level1/1.png') }}" data-num="1" id="img1" draggable="true" ondragstart="drag(event)">
@@ -101,18 +127,18 @@
         </div>
     </div>
 
-    <button id="btnFinish" class="btn btn-warning mt-4 px-4" onclick="goToIndex()">
+    <button id="btnFinish" class="btn btn-warning btn-finish" onclick="goToIndex()">
         Завершить уровень
     </button>
 </div>
 
-<div class="modal fade" id="winModal" tabindex="-1" aria-labelledby="winModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+<div class="modal fade" id="winModal" tabindex="-1" role="dialog" aria-labelledby="winModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content text-center border-0 shadow">
             <div class="modal-body py-4">
-                <h3 id="winModalLabel" class="text-success mb-2">Вы выиграли!</h3>
+                <h3 id="winModalLabel" class="text-success mb-2">🎉 Вы выиграли!</h3>
                 <p class="text-muted mb-1">Пазл собран верно.</p>
-                <p class="mb-3">Ваше время: <strong id="finalTime" class="text-success fs-5">--:--</strong></p>
+                <p class="mb-3">Ваше время: <strong id="finalTime" class="text-success" style="font-size: 1.2rem;">--:--</strong></p>
                 <button type="button" class="btn btn-success px-4" onclick="closeWinModal()">
                     Продолжить
                 </button>
@@ -121,13 +147,9 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
-    // === ТАЙМЕР ===
     let timerInterval = null;
     let startTime = null;
-    let finalTimeSeconds = 0;
 
     function formatTime(seconds) {
         const m = Math.floor(seconds / 60).toString().padStart(2, '0');
@@ -148,12 +170,8 @@
             clearInterval(timerInterval);
             timerInterval = null;
         }
-        finalTimeSeconds = Math.floor((Date.now() - startTime) / 1000);
-        return finalTimeSeconds;
+        return Math.floor((Date.now() - startTime) / 1000);
     }
-
-    const winModalEl = document.getElementById('winModal');
-    const winModal = new bootstrap.Modal(winModalEl);
 
     function shuffle(array) {
         for (let i = array.length - 1; i > 0; i--) {
@@ -205,7 +223,7 @@
             
             saveResultToServer(time);
             
-            winModal.show();
+            $('#winModal').modal('show');
         }
     }
 
@@ -249,9 +267,7 @@
     function saveResultToServer(timeSeconds) {
         fetch('/api/save_level_result', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 level: 1,
                 time_seconds: timeSeconds,
@@ -259,16 +275,12 @@
             })
         })
         .then(response => response.json())
-        .then(data => {
-            console.log('Результат сохранён:', data);
-        })
-        .catch(error => {
-            console.error('Ошибка при сохранении результата:', error);
-        });
+        .then(data => console.log('Результат сохранён:', data))
+        .catch(error => console.error('Ошибка при сохранении результата:', error));
     }
 
     function closeWinModal() {
-        winModal.hide();
+        $('#winModal').modal('hide');
         document.getElementById("btnFinish").style.display = "none";
     }
 
@@ -276,8 +288,6 @@
         window.location.href = "/index";
     }
 
-    window.onload = initGame;
+    document.addEventListener('DOMContentLoaded', initGame);
 </script>
-
-</body>
-</html>
+{% endblock %}
