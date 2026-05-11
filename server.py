@@ -1,5 +1,4 @@
 from flask import Flask, render_template, redirect, url_for, request, jsonify, session
-from forms.RegisterForm import RegisterForm
 from forms.LoginForm import LoginForm
 from data.User import User
 from data import db_session
@@ -33,30 +32,6 @@ def index():
     error = session.get("error")
 
     return render_template("index.html", user_id=user_id, points=user_points, error=error, counters=list(range(1, 3)))
-
-
-@app.route("/register", methods=['GET', 'POST'])
-def register():
-    form = RegisterForm()
-    if form.validate_on_submit():
-        if form.password.data != form.password_again.data:
-            return render_template('register.html', title='Регистрация',
-                                   form=form,
-                                   message="Пароли не совпадают")
-        db_sess = db_session.create_session()
-        if db_sess.query(User).filter(User.email == form.email.data).first():
-            return render_template('register.html', title='Регистрация', form=form,
-                                   message="Такой пользователь уже есть")
-        user = User(
-            name=form.name.data,
-            surname=form.surname.data,
-            email=form.email.data,
-        )
-        user.set_password(form.password.data)
-        db_sess.add(user)
-        db_sess.commit()
-        return redirect('/login')
-    return render_template('register.html', title='Регистрация', form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
