@@ -11,11 +11,27 @@ from utils.get_points import get_points
 from utils.post_points import post_points
 from utils.login import login as API_login
 
-
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
-login_manager.init_app(app)
+
+def create_app():
+    """
+    Фабрика для создания экземпляра веб-приложения.
+    Инициализирует все компоненты игры.
+    """
+    # 1. Создаем экземпляр приложения
+    app = Flask(__name__)
+
+    # 2. Загружаем конфигурацию
+    app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
+
+    # 3. Инициализируем игровые компоненты (раскомментируйте по необходимости)
+    login_manager.init_app(app)  # если есть система входа
+    # db_session.global_init("database.db") # если есть база данных
+    # game_engine.init(app)                # ваш игровой движок
+    return app
+
+
+app = create_app()
 
 
 @login_manager.user_loader
@@ -44,7 +60,6 @@ def login():
 
     if not (email and password):
         return render_template("login.html", error={"message": "ERROR!!!"})
-
 
     try:
         API_login(email, password)
@@ -87,14 +102,9 @@ def points():
             session["user_points"] = post_points(points)
         except Exception as e:
             session["error"] = e
-        
+
     return redirect(url_for("index"))
 
 
-def main():
-    app.run()
-
-
-if __name__ == '__main__':
-    db_session.global_init("db/mozaika.db")
-    main()
+if __name__ == "__main__":
+    app.run(debug=True)
