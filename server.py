@@ -72,7 +72,7 @@ def login():
 
 
     try:
-        API_login(email, password);
+        API_login(email, password)
     except requests.exceptions.RequestException as e:
         print(f"Ошибка API login: {e}")
         return render_template("login.html", error={"message": "ERROR!!!"})
