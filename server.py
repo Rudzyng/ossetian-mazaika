@@ -102,11 +102,6 @@ def play_level2():
     return render_template("playlevel2.html")
 
 
-@app.route('/create')
-def create():
-    return render_template("base.html")
-
-
 @app.route("/points", methods=["GET", "POST"])
 def points():
     if request.method == "GET":
