@@ -12,14 +12,14 @@ def post_points(amount: int) -> int:
     if not user_id: raise Exception("Не записан user_id в сессию.")
 
     games = get_all_games()
-    game_id = None
+    game_id = 10
 
-    for game in games:
-        if game.get("gameTitle") == "Тестовая игра":
-            game_id = game.get("gameId")
-            break
-    else:
-        raise Exception("Нет игры с таким названием")
+    # for game in games:
+    #     if game.get("gameTitle") == "Тестовая игра":
+    #         game_id = game.get("gameId")
+    #         break
+    # else:
+    #     raise Exception("Нет игры с таким названием")
 
     headers = {
         "X-API-Key": API_SECRET_KEY
