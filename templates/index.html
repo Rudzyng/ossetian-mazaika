@@ -62,18 +62,12 @@
 {% endblock %}
 
 {% block content %}
-<h1 class="text-center font-bold">
-  Веб-приложение для демонстрации<br>базовой работы с рудзынг API
-</h1>
 
 <section class="flex flex-col gap-4 justify-center items-center mt-6 w-full px-4">
   <h1>Играть</h1>
     {%for i in counters%}
         <a class="btn btn-primary" href="/play_level{{i}}" role="button">Уровень {{i}}</a>
     {%endfor%}
-  <h2 class="text-center font-bold">
-    Кнопки, реализующие работу с API
-  </h2>
 
   <div class="buttons-container flex flex-col gap-3">
     {% if not user_id %}
