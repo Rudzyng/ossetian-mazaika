@@ -1,0 +1,17 @@
+import sqlalchemy
+from sqlalchemy import orm
+
+from .db_session import SqlAlchemyBase
+
+
+class PuzzlePart(SqlAlchemyBase):
+    """Часть пазла"""
+    __tablename__ = 'puzzle_parts'
+
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    level_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("levels.id"), nullable=False)
+
+    image_file = sqlalchemy.Column(sqlalchemy.String, nullable=False)
+    word_ossetian = sqlalchemy.Column(sqlalchemy.String, nullable=False)
+
+    level = orm.relationship("Level", back_populates="parts")
