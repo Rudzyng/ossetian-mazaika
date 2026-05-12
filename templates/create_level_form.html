@@ -170,3 +170,96 @@
     }
 </style>
 {% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+    <h1 class="create-title">
+        <span style="font-size: 1.6rem;">🎨</span>
+        Создание нового уровня
+    </h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" enctype="multipart/form-data" class="create-form">
+        <div class="form-section">
+            <div class="form-section-title">
+                <span class="icon">📋</span>
+                Информация об уровне
+            </div>
+
+            <label class="form-label">Название уровня (на осетинском):</label>
+            <input type="text" class="form-input" name="level_name" required placeholder="например: Цӕрӕгойтӕ">
+
+            <label class="form-label">Размер сетки:</label>
+            <select class="form-input" id="grid_size" name="grid_size" required>
+                <option value="2">2x2 (4 части) - Легкий</option>
+                <option value="3">3x3 (9 частей) - Средний</option>
+                <option value="4">4x4 (16 частей) - Сложный</option>
+                <option value="5">5x5 (25 частей) - Эксперт</option>
+            </select>
+        </div>
+
+        <div class="form-section">
+            <div class="form-section-title">
+                <span class="icon">🧩</span>
+                Части пазла
+                <span id="partsCount" style="font-size: 0.7rem; color: #667eea;"></span>
+            </div>
+            <div id="parts-container" class="parts-container">
+                <div style="text-align: center; padding: 2rem; color: #9ca3af;">Выберите размер сетки</div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-create">
+            <span class="icon">💾</span> Создать уровень
+        </button>
+        <a href="/" class="btn-create btn-secondary" style="display: block; text-align: center;">
+            <span class="icon">🏠</span> Отмена
+        </a>
+    </form>
+</div>
+
+<script>
+    const gridSizeSelect = document.getElementById('grid_size');
+    const partsContainer = document.getElementById('parts-container');
+
+    function generatePartFields() {
+        const size = parseInt(gridSizeSelect.value);
+        const totalParts = size * size;
+
+        document.getElementById('partsCount').textContent = `(всего ${totalParts} частей)`;
+
+        partsContainer.innerHTML = '';
+
+        for (let i = 0; i < totalParts; i++) {
+            const partHtml = `
+                <div class="part-card">
+                    <div class="part-header">
+                        <span class="icon">🧩</span>
+                        Часть ${i + 1} / ${totalParts}
+                    </div>
+                    <div>
+                        <label class="form-label">Слово на осетинском:</label>
+                        <input type="text" class="form-input" name="word_ossetian_${i}" required>
+                    </div>
+                    <div>
+                        <label class="form-label">Изображение:</label>
+                        <input type="file" class="form-input" name="image_${i}" accept="image/*" required>
+                        <small style="color: #6b7280; font-size: 0.65rem;">Рекомендуемый размер: квадратное изображение</small>
+                    </div>
+                </div>
+            `;
+            partsContainer.innerHTML += partHtml;
+        }
+    }
+
+    gridSizeSelect.addEventListener('change', generatePartFields);
+    document.addEventListener('DOMContentLoaded', generatePartFields);
+</script>
+{% endblock %}
