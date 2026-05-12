@@ -42,6 +42,100 @@ def index():
     return render_template('editor_index.html', levels=levels)
 
 
+@app.route('/create_level', methods=['GET', 'POST'])
+# @login_required
+def create_level():
+    if request.method == 'GET':
+        return render_template('create_level_form.html')
+
+    try:
+        level_name = request.form.get('level_name')
+        grid_size = int(request.form.get('grid_size', 2))
+
+        if not level_name:
+            flash('Название уровня обязательно', 'error')
+            return redirect(url_for('create_level'))
+
+        db_sess = db_session.create_session()
+
+        # Создаем уровень только с обязательными полями
+        level = Level()
+        level.name = level_name
+        level.grid_size = grid_size
+
+        db_sess.add(level)
+        db_sess.flush()
+
+        total_parts = grid_size * grid_size
+        for i in range(total_parts):
+            part = PuzzlePart()
+            part.level_id = level.id
+
+            word_ossetian = request.form.get(f'word_ossetian_{i}')
+
+            # Обработка изображения
+            image_file = request.files.get(f'image_{i}')
+            if image_file and allowed_file(image_file.filename):
+                filename = secure_filename(f"level_{level.id}_part_{i}_{image_file.filename}")
+                image_file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                part.image_file = f"uploads/{filename}"
+            else:
+                part.image_file = f"defaults/part_{i + 1}.png"
+
+            part.word_ossetian = word_ossetian
+            db_sess.add(part)
+
+        db_sess.commit()
+        flash(f'Уровень "{level_name}" успешно создан!', 'success')
+        return redirect(url_for('index'))
+
+    except Exception as e:
+        flash(f'Ошибка при создании уровня: {str(e)}', 'error')
+        return redirect(url_for('create_level'))
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == "GET":
+        return render_template("editor_login.html")
+
+    email = request.form.get("email")
+    password = request.form.get("password")
+
+    if not (email and password):
+        return render_template("editor_login.html", error={"message": "Заполните все поля!"})
+
+    try:
+        API_login(email, password)
+
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.email == email).first()
+
+        if not user:
+            user = User()
+            user.email = email
+            user.name = email.split('@')[0]
+            user.surname = ""
+            user.set_password(password)
+            db_sess.add(user)
+            db_sess.commit()
+
+        # login_user(user)
+        session["user_id"] = user.id
+        session["user_email"] = user.email
+
+        return redirect(url_for("index"))
+
+    except requests.exceptions.RequestException as e:
+        print(f"Ошибка API login: {e}")
+        return render_template("editor_login.html", error={"message": "Ошибка соединения с сервером"})
+    except ValueError as e:
+        return render_template("editor_login.html", error={"message": "Неверный email или пароль"})
+    except Exception as e:
+        print(f"Неизвестная ошибка: {e}")
+        return render_template("editor_login.html", error={"message": "Произошла ошибка при входе"})
+
+
 @app.route('/logout')
 # @login_required
 def logout():
