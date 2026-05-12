@@ -14,19 +14,24 @@
         padding: 10px;
         border-radius: 12px;
         box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        
+        /* 🔥 Центрирование контейнера */
         display: flex;
         justify-content: center;
         align-items: center;
-        width: 100%;
+        width: fit-content;
+        margin: 0 auto;
+        
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255,255,255,0.3);
     }
 
     .puzzle-grid {
         display: grid;
-        grid-template-columns: repeat(3, 120px);
-        grid-template-rows: repeat(3, 120px);
-        gap: 8px;
+        /* 🔥 Увеличенные ячейки: 130px вместо 120px */
+        grid-template-columns: repeat(3, 200px);
+        grid-template-rows: repeat(3, 200px);
+        gap: 10px;
     }
 
     .cell {
@@ -142,7 +147,9 @@
         margin-bottom: 10px;
         padding: 0 4px;
         width: 100%;
-        max-width: 380px;
+        /* 🔥 Увеличена ширина под новый размер пазла 3×3 */
+        max-width: 430px;
+        box-sizing: border-box;
     }
     
     .level-title {
@@ -243,7 +250,8 @@
 {% endblock %}
 
 {% block content %}
-<div class="d-flex flex-column align-items-center" style="padding-top: 0.5rem;">
+<!-- 🔥 Обёртка для центрирования всего контента -->
+<div style="display: flex; flex-direction: column; align-items: center; width: 100%; padding-top: 0.5rem;">
     
     <!-- Шапка с таймером -->
     <div class="level-header">
@@ -256,7 +264,7 @@
         </div>
     </div>
 
-    <!-- Игровое поле 3x3 -->
+    <!-- 🔥 Пазл 3×3: контейнер отцентрирован через margin: 0 auto + flex -->
     <div class="puzzle-wrapper">
         <div class="puzzle-grid">
             <div class="cell" data-pos="0" ondrop="drop(event)" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)"></div>
