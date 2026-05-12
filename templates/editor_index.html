@@ -159,3 +159,68 @@
     }
 </style>
 {% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+    <h1 class="editor-title">
+        <span style="font-size: 1.6rem;">🎨</span>
+        Редактор уровней
+    </h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="levels-list">
+        <h3 style="font-size: 1rem; margin-bottom: 0.8rem; color: #374151;">📋 Существующие уровни</h3>
+
+        {% if levels %}
+            {% for level in levels %}
+            <div class="level-item">
+                <div class="level-info">
+                    <div class="level-name">{{ level.name }}</div>
+                    <div class="level-meta">
+                        Размер: {{ level.grid_size }}x{{ level.grid_size }} |
+                        Частей: {{ level.parts|length }}
+                    </div>
+                </div>
+                <div class="level-actions">
+                    <a href="/edit_level/{{ level.id }}" class="btn-icon btn-edit" title="Редактировать">
+                        ✏️
+                    </a>
+                    <button onclick="deleteLevel({{ level.id }}, '{{ level.name }}')" class="btn-icon btn-delete" title="Удалить">
+                        🗑️
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <span style="font-size: 2rem;">📭</span>
+                <p>Нет созданных уровней</p>
+                <p style="font-size: 0.8rem;">Создайте свой первый уровень!</p>
+            </div>
+        {% endif %}
+
+        <a href="/create_level" class="btn-create-new">
+            <span class="icon">➕</span> Создать новый уровень
+        </a>
+
+        <a href="/" class="btn-back">
+            <span class="icon">🏠</span> На главную
+        </a>
+    </div>
+</div>
+
+<script>
+    function deleteLevel(levelId, levelName) {
+        if (confirm(`Вы уверены, что хотите удалить уровень "${levelName}"?\nЭто действие нельзя отменить.`)) {
+            window.location.href = `/delete_level/${levelId}`;
+        }
+    }
+</script>
+{% endblock %}
