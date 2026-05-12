@@ -26,7 +26,7 @@ def create_app():
 
     # 3. Инициализируем игровые компоненты (раскомментируйте по необходимости)
     login_manager.init_app(app)  # если есть система входа
-    # db_session.global_init("database.db") # если есть база данных
+    db_session.global_init("db/mozaika.db") # если есть база данных
     # game_engine.init(app)                # ваш игровой движок
     return app
 
