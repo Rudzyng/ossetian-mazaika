@@ -94,6 +94,41 @@ def create_level():
         return redirect(url_for('create_level'))
 
 
+@app.route('/edit_level/<int:level_id>', methods=['GET', 'POST'])
+# @login_required
+def edit_level(level_id):
+    db_sess = db_session.create_session()
+    level = db_sess.query(Level).get(level_id)
+
+    if not level:
+        flash('Уровень не найден', 'error')
+        return redirect(url_for('index'))
+
+    if request.method == 'GET':
+        return render_template('edit_level_form.html', level=level)
+
+    try:
+        level.name = request.form.get('level_name', level.name)
+
+        for i, part in enumerate(level.parts):
+            part.word_ossetian = request.form.get(f'word_ossetian_{i}', part.word_ossetian)
+
+            image_file = request.files.get(f'image_{i}')
+            if image_file and allowed_file(image_file.filename):
+                filename = secure_filename(f"level_{level.id}_part_{i}_{image_file.filename}")
+                image_file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                part.image_file = f"uploads/{filename}"
+
+        db_sess.commit()
+        flash(f'Уровень "{level.name}" успешно обновлен!', 'success')
+
+    except Exception as e:
+        flash(f'Ошибка при обновлении: {str(e)}', 'error')
+
+    return redirect(url_for('index'))
+
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == "GET":
