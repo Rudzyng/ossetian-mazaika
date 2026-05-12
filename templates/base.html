@@ -214,7 +214,7 @@
       <nav class="navbar navbar-light">
         <a class="navbar-brand" href="/">🧩 Осетинская мозаика</a>
         <div class="d-flex align-items-center gap-2">
-          {% if current_user.is_authenticated %}
+          {% if user_id %}
             <span class="text-muted small me-2">{{ current_user.name }}</span>
             <a class="btn btn-success" href="/logout">Выйти</a>
           {% else %}
