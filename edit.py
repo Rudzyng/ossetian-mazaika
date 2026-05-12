@@ -128,6 +128,21 @@ def edit_level(level_id):
     return redirect(url_for('index'))
 
 
+@app.route('/delete_level/<int:level_id>')
+# @login_required
+def delete_level(level_id):
+    db_sess = db_session.create_session()
+    level = db_sess.query(Level).get(level_id)
+
+    if level:
+        db_sess.delete(level)
+        db_sess.commit()
+        flash(f'Уровень "{level.name}" удален', 'success')
+    else:
+        flash('Уровень не найден', 'error')
+
+    return redirect(url_for('index'))
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
