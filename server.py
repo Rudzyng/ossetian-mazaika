@@ -188,8 +188,6 @@ def save_level_result():
                 'saved_to_db': True
             })
     print("sfsdfsdf")
-    
-    # 🔥 Если не авторизован — сохраняем только в сессию (временное хранение)
     if 'level_results' not in session:
         session['level_results'] = {}
     
@@ -206,22 +204,6 @@ def save_level_result():
         'points': points,
         'saved_to_db': False,
         'requires_login': True
-    })
-
-
-@app.route('/api/get_user_stats')
-def get_user_stats():
-    """Возвращает статистику пользователя"""
-    if not current_user.is_authenticated:
-        return jsonify({'success': False}), 401
-
-    return jsonify({
-        'success': True,
-        'user': {
-            'name': current_user.name,
-            'level1_points': current_user.level1,
-            'level2_points': current_user.level2,
-        }
     })
 
 
