@@ -177,9 +177,12 @@ def save_level_result():
                 setattr(user, score_field, points)
                 db_sess.commit()
                 is_new_record = True
+                # if current_best is None:
+                #     post_points(points)
+                # else:
+                #     post_points(points - current_best)
             else:
                 is_new_record = False
-            
             return jsonify({
                 'success': True,
                 'message': 'Новый рекорд!' if is_new_record else 'Результат сохранён',

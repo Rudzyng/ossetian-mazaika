@@ -11,7 +11,6 @@ def post_points(amount: int) -> int:
 
     if not user_id: raise Exception("Не записан user_id в сессию.")
 
-    games = get_all_games()
     game_id = 10
 
     headers = {
