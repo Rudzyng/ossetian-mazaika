@@ -472,18 +472,74 @@
     }
 
     function saveResultToServer(timeSeconds) {
+        console.log('📤 Отправка результата:', timeSeconds);
+        
         fetch('/api/save_level_result', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                level: 2,
+                level: 1,  // или 2 для уровня 2
                 time_seconds: timeSeconds,
                 time_formatted: formatTime(timeSeconds)
             })
         })
         .then(response => response.json())
-        .then(data => console.log('Результат сохранён:', data))
-        .catch(error => console.error('Ошибка при сохранении:', error));
+        .then(data => {
+            console.log('✅ Ответ сервера:', data);
+            
+            if (data.success) {
+                // 🔥 Показываем красивое уведомление о рекорде
+                if (data.is_new_record) {
+                    showRecordNotification(data.points, data.time_formatted);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('❌ Ошибка:', error);
+        });
+    }
+
+    // 🔥 Функция для показа уведомления о новом рекорде
+    function showRecordNotification(points, timeFormatted) {
+        // Создаём элемент уведомления
+        const notification = document.createElement('div');
+        notification.className = 'record-notification';
+        notification.innerHTML = `
+            <div style="
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: linear-gradient(135deg, #fbbf24, #f59e0b);
+                color: white;
+                padding: 12px 24px;
+                border-radius: 12px;
+                font-weight: 600;
+                font-size: 14px;
+                box-shadow: 0 8px 25px rgba(251, 191, 36, 0.5);
+                z-index: 2000;
+                animation: slideDown 0.3s ease, fadeOut 0.3s ease 2.7s;
+            ">
+                🏆 Новый рекорд! ${points} баллов за ${timeFormatted}
+            </div>
+            <style>
+                @keyframes slideDown {
+                    from { top: -60px; opacity: 0; }
+                    to { top: 20px; opacity: 1; }
+                }
+                @keyframes fadeOut {
+                    from { opacity: 1; }
+                    to { opacity: 0; }
+                }
+            </style>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Удаляем уведомление после анимации
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
     }
 
     // 🔥 Закрытие кастомной модалки
