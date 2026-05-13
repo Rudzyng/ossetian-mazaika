@@ -1,11 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
-from flask_login import LoginManager
-
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from data import db_session
 from data.Level import Level
 from data.PuzzlePart import PuzzlePart
 from data.User import User
-# from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 import os
 from werkzeug.utils import secure_filename
 import requests
@@ -37,13 +35,11 @@ def load_user(user_id):
 
 @app.route('/')
 def index():
-    db_sess = db_session.create_session()
-    levels = db_sess.query(Level).all()
-    return render_template('editor_index.html', levels=levels)
+    return render_template('editor_index.html', user=current_user)
 
 
 @app.route('/create_level', methods=['GET', 'POST'])
-# @login_required
+@login_required
 def create_level():
     if request.method == 'GET':
         return render_template('create_level_form.html')
@@ -58,7 +54,6 @@ def create_level():
 
         db_sess = db_session.create_session()
 
-        # Создаем уровень только с обязательными полями
         level = Level()
         level.name = level_name
         level.grid_size = grid_size
@@ -70,19 +65,17 @@ def create_level():
         for i in range(total_parts):
             part = PuzzlePart()
             part.level_id = level.id
+            part.word_ossetian = request.form.get(f'word_ossetian_{i}')
+            # или если несколько слов через запятую:
+            # part.words = request.form.get(f'words_{i}')
 
-            word_ossetian = request.form.get(f'word_ossetian_{i}')
-
-            # Обработка изображения
+            # Сохраняем картинку
             image_file = request.files.get(f'image_{i}')
-            if image_file and allowed_file(image_file.filename):
+            if image_file:
                 filename = secure_filename(f"level_{level.id}_part_{i}_{image_file.filename}")
                 image_file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 part.image_file = f"uploads/{filename}"
-            else:
-                part.image_file = f"defaults/part_{i + 1}.png"
 
-            part.word_ossetian = word_ossetian
             db_sess.add(part)
 
         db_sess.commit()
@@ -95,7 +88,7 @@ def create_level():
 
 
 @app.route('/edit_level/<int:level_id>', methods=['GET', 'POST'])
-# @login_required
+@login_required
 def edit_level(level_id):
     db_sess = db_session.create_session()
     level = db_sess.query(Level).get(level_id)
@@ -129,7 +122,7 @@ def edit_level(level_id):
 
 
 @app.route('/delete_level/<int:level_id>')
-# @login_required
+@login_required
 def delete_level(level_id):
     db_sess = db_session.create_session()
     level = db_sess.query(Level).get(level_id)
@@ -170,28 +163,30 @@ def login():
             db_sess.add(user)
             db_sess.commit()
 
-        # login_user(user)
+        login_user(user)
+
+        # Сохраняем в сессию для обратной совместимости
         session["user_id"] = user.id
         session["user_email"] = user.email
 
+        flash(f'Добро пожаловать, {user.name}!', 'success')
         return redirect(url_for("index"))
 
     except requests.exceptions.RequestException as e:
         print(f"Ошибка API login: {e}")
         return render_template("editor_login.html", error={"message": "Ошибка соединения с сервером"})
-    except ValueError as e:
-        return render_template("editor_login.html", error={"message": "Неверный email или пароль"})
     except Exception as e:
-        print(f"Неизвестная ошибка: {e}")
-        return render_template("editor_login.html", error={"message": "Произошла ошибка при входе"})
+        print(f"Ошибка: {e}")
+        return render_template("editor_login.html", error={"message": "Неверный email или пароль"})
 
 
 @app.route('/logout')
-# @login_required
+@login_required
 def logout():
-    # logout_user()
+    logout_user()
     session.pop("user_id", None)
     session.pop("user_email", None)
+    flash('Вы вышли из системы', 'success')
     return redirect(url_for('login'))
 
 

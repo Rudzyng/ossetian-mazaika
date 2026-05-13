@@ -204,7 +204,7 @@
         <a class="navbar-brand" href="/">🧩 Осетинская мозаика</a>
         <div class="d-flex align-items-center gap-2">
           {% if user_id %}
-            <span class="text-muted small me-2">{{ current_user.name }}</span>
+            <span class="text-muted small me-2">{{ current_user.email }}</span>
             <a class="btn btn-success" href="/logout">Выйти</a>
           {% else %}
             <a class="btn btn-success" href="/login">Войти</a>
