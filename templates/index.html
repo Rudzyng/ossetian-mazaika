@@ -198,7 +198,7 @@
     <div class="levels-grid">
         {% for i in counters %}
             <a class="btn btn-level" href="/play_level{{i}}" role="button">
-                <span class="icon">🏆</span>Ур. {{i}}
+                <span class="icon">🏆</span>Уровень {{i}}
             </a>
         {% endfor %}
     </div>
@@ -213,34 +213,7 @@
                 <span class="icon">🔐</span>Войти в рудзынг.рф
             </a>
         {% endif %}
-
-        {% if user_id %}
-            <form action="/points" method="get">
-                <input type="hidden" value="get" name="action" />
-                <button type="submit" class="btn btn-action">
-                    <span class="icon">💎</span>Получить баллы
-                </button>
-            </form>
-            
-            <form action="/points" method="post">
-                <input type="hidden" value="add" name="action" />
-                <input type="number" name="points" placeholder="Баллы" required min="1" />
-                <button type="submit" class="btn btn-level" style="padding:0.6rem">
-                    <span class="icon">➕</span>Добавить
-                </button>
-            </form>
-            
-            <a href="/logout" class="btn btn-logout">
-                <span class="icon">🚪</span>Выйти
-            </a>
-        {% endif %}
     </div>
-
-    {% if points %}
-    <div class="points-badge">
-        <span class="points-text">✨ {{ points }} баллов</span>
-    </div>
-    {% endif %}
 
     {% if error %}
     <div class="error-badge">
