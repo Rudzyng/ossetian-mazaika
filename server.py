@@ -1,7 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, request, jsonify, session
 from forms.LoginForm import LoginForm
 from data.User import User
-from data.GameResult import GameResult
 from data import db_session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_restful import abort
@@ -86,12 +85,14 @@ def logout():
 
 @app.route('/play_level1')
 def play_level1():
-    return render_template('playlevel1.html')
+    user_id = session.get("user_id", None)
+    return render_template('playlevel1.html', user_id=user_id)
 
 
 @app.route('/play_level2')
 def play_level2():
-    return render_template("playlevel2.html")
+    user_id = session.get("user_id", None)
+    return render_template("playlevel2.html", user_id=user_id)
 
 
 @app.route('/rules')
@@ -113,44 +114,45 @@ def points():
     return redirect(url_for("index"))
 
 
-@app.route('/api/save_level_result', methods=['POST'])
-def save_level_result():
-    data = request.get_json()
+# @app.route('/api/save_level_result', methods=['POST'])
+# def save_level_result():
+#     data = request.get_json()
 
-    if not data:
-        return jsonify({'success': False, 'error': 'No data'}), 400
+#     if not data:
+#         return jsonify({'success': False, 'error': 'No data'}), 400
 
-    level = data.get('level')
-    time_seconds = data.get('time_seconds')
-    time_formatted = data.get('time_formatted')
+#     level = data.get('level')
+#     time_seconds = data.get('time_seconds')
+#     time_formatted = data.get('time_formatted')
 
-    if level not in [1, 2] or time_seconds is None:
-        return jsonify({'success': False}), 400
+#     if level not in [1, 2] or time_seconds is None:
+#         return jsonify({'success': False}), 400
 
-    if 'level_results' not in session:
-        session['level_results'] = {}
+#     if 'level_results' not in session:
+#         session['level_results'] = {}
     
-    session['level_results'][f'level_{level}'] = {
-        'time_seconds': time_seconds,
-        'time_formatted': time_formatted,
-        'timestamp': datetime.datetime.utcnow().isoformat()
-    }
-    session.modified = True
-    if current_user.is_authenticated:
-        db_sess = db_session.create_session()
-        result = GameResult(
-            user_id=current_user.id,
-            level_id=0,
-            time_seconds=time_seconds
-        )
-        db_sess.add(result)
-        db_sess.commit()
+#     session['level_results'][f'level_{level}'] = {
+#         'time_seconds': time_seconds,
+#         'time_formatted': time_formatted,
+#         'timestamp': datetime.datetime.utcnow().isoformat()
+#     }
+#     session.modified = True
+#     if current_user.is_authenticated:
+#         print("tes")
+#         db_sess = db_session.create_session()
+#         result = GameResult(
+#             user_id=current_user.id,
+#             level_id=0,
+#             time_seconds=time_seconds
+#         )
+#         db_sess.add(result)
+#         db_sess.commit()
 
-    return jsonify({
-        'success': True,
-        'message': 'Результат сохранён',
-        'time': time_formatted
-    })
+#     return jsonify({
+#         'success': True,
+#         'message': 'Результат сохранён',
+#         'time': time_formatted
+#     })
 
 
 if __name__ == "__main__":
