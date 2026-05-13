@@ -5,7 +5,7 @@ from data import db_session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_restful import abort
 import requests
-import datetime
+from datetime import datetime
 
 from constants import APP_SECRET_KEY
 from utils.get_points import get_points
@@ -13,6 +13,31 @@ from utils.post_points import post_points
 from utils.login import login as API_login
 
 login_manager = LoginManager()
+
+
+def calculate_points(time_seconds):
+    """
+    Правила:
+    < 10 сек - 10 баллов
+    < 20 сек - 8 баллов
+    < 30 сек - 6 баллов
+    < 40 сек - 4 балла
+    < 60 сек - 2 балла
+    >= 60 сек - 0 баллов
+    """
+    if time_seconds < 10:
+        return 10
+    elif time_seconds < 20:
+        return 8
+    elif time_seconds < 30:
+        return 6
+    elif time_seconds < 40:
+        return 4
+    elif time_seconds < 60:
+        return 2
+    else:
+        return 0
+
 
 def create_app():
     """
@@ -60,19 +85,30 @@ def login():
     password = request.form.get("password")
 
     if not (email and password):
-        return render_template("login.html", error={"message": "ERROR!!!"})
+        return render_template("login.html", error={"message": "Заполните все поля"})
 
     try:
         API_login(email, password)
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.email == email).first()
+        if not user:
+            user = User(
+                name=email.split('@')[0],
+                surname="",
+                email=email
+            )
+            user.set_password(password)
+            db_sess.add(user)
+            db_sess.commit()
+        login_user(user)
+
+        return redirect(url_for("index"))
+
     except requests.exceptions.RequestException as e:
         print(f"Ошибка API login: {e}")
-        return render_template("login.html", error={"message": "ERROR!!!"})
+        return render_template("login.html", error={"message": "Ошибка соединения с сервером"})
     except ValueError:
-        return render_template(
-            "login.html", error={"message": "Неверный ответ от сервера"}
-        )
-
-    return redirect(url_for("index"))
+        return render_template("login.html", error={"message": "Неверный ответ от сервера"})
 
 
 @app.route('/logout')
@@ -114,45 +150,64 @@ def points():
     return redirect(url_for("index"))
 
 
-# @app.route('/api/save_level_result', methods=['POST'])
-# def save_level_result():
-#     data = request.get_json()
-
-#     if not data:
-#         return jsonify({'success': False, 'error': 'No data'}), 400
-
-#     level = data.get('level')
-#     time_seconds = data.get('time_seconds')
-#     time_formatted = data.get('time_formatted')
-
-#     if level not in [1, 2] or time_seconds is None:
-#         return jsonify({'success': False}), 400
-
-#     if 'level_results' not in session:
-#         session['level_results'] = {}
+@app.route('/api/save_level_result', methods=['POST'])
+def save_level_result():
+    data = request.get_json()
+    if not data:
+        return jsonify({'success': False, 'error': 'No data'}), 400
     
-#     session['level_results'][f'level_{level}'] = {
-#         'time_seconds': time_seconds,
-#         'time_formatted': time_formatted,
-#         'timestamp': datetime.datetime.utcnow().isoformat()
-#     }
-#     session.modified = True
-#     if current_user.is_authenticated:
-#         print("tes")
-#         db_sess = db_session.create_session()
-#         result = GameResult(
-#             user_id=current_user.id,
-#             level_id=0,
-#             time_seconds=time_seconds
-#         )
-#         db_sess.add(result)
-#         db_sess.commit()
+    level = data.get('level')
+    time_seconds = data.get('time_seconds')
+    time_formatted = data.get('time_formatted')
+    
+    if level not in [1, 2] or time_seconds is None:
+        return jsonify({'success': False, 'error': 'Invalid data'}), 400
+    
+    points = calculate_points(time_seconds)
 
-#     return jsonify({
-#         'success': True,
-#         'message': 'Результат сохранён',
-#         'time': time_formatted
-#     })
+    if current_user.is_authenticated:
+        db_sess = db_session.create_session()
+        user = db_sess.get(User, current_user.id)
+        
+        if user:
+            score_field = 'level1' if level == 1 else 'level2'
+            current_best = getattr(user, score_field)
+            
+            if current_best is None or points > current_best:
+                setattr(user, score_field, points)
+                db_sess.commit()
+                is_new_record = True
+                # if current_best is None:
+                #     post_points(points)
+                # else:
+                #     post_points(points - current_best)
+            else:
+                is_new_record = False
+            return jsonify({
+                'success': True,
+                'message': 'Новый рекорд!' if is_new_record else 'Результат сохранён',
+                'points': points,
+                'is_new_record': is_new_record,
+                'saved_to_db': True
+            })
+    print("sfsdfsdf")
+    if 'level_results' not in session:
+        session['level_results'] = {}
+    
+    session['level_results'][f'level_{level}'] = {
+        'points': points,
+        'time_formatted': time_formatted,
+        'timestamp': datetime.utcnow().isoformat()
+    }
+    session.modified = True
+    
+    return jsonify({
+        'success': True,
+        'message': 'Результат сохранён временно (войдите для постоянного сохранения)',
+        'points': points,
+        'saved_to_db': False,
+        'requires_login': True
+    })
 
 
 if __name__ == "__main__":

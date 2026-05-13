@@ -8,27 +8,22 @@
         crossorigin="anonymous"></script>
 
 <style>
-    /* === Стили пазла === */
     .puzzle-wrapper {
         background: rgba(255, 255, 255, 0.95);
         padding: 10px;
         border-radius: 12px;
         box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-        
-        /* 🔥 Центрирование контейнера */
         display: flex;
         justify-content: center;
         align-items: center;
         width: fit-content;
         margin: 0 auto;
-        
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255,255,255,0.3);
     }
 
     .puzzle-grid {
         display: grid;
-        /* 🔥 Увеличенные ячейки: 130px вместо 120px */
         grid-template-columns: repeat(3, 200px);
         grid-template-rows: repeat(3, 200px);
         gap: 10px;
@@ -70,7 +65,6 @@
         opacity: 0.95;
     }
 
-    /* === Таймер === */
     .timer-display {
         font-size: 1.15rem;
         font-weight: 700;
@@ -90,7 +84,6 @@
         box-shadow: 0 0 0 2px #10b981, 0 4px 12px rgba(16, 185, 129, 0.3);
     }
 
-    /* === Кнопки === */
     .btn-home {
         margin-left: 8px;
         background: white;
@@ -139,7 +132,6 @@
         transform: none;
     }
 
-    /* === Шапка уровня === */
     .level-header {
         display: flex;
         justify-content: space-between;
@@ -147,7 +139,6 @@
         margin-bottom: 10px;
         padding: 0 4px;
         width: 100%;
-        /* 🔥 Увеличена ширина под новый размер пазла 3×3 */
         max-width: 430px;
         box-sizing: border-box;
     }
@@ -160,7 +151,6 @@
         text-shadow: 0 1px 4px rgba(0,0,0,0.25);
     }
 
-    /* === КАСТОМНАЯ МОДАЛКА === */
     .custom-modal {
         position: fixed;
         inset: 0;
@@ -250,10 +240,8 @@
 {% endblock %}
 
 {% block content %}
-<!-- 🔥 Обёртка для центрирования всего контента -->
 <div style="display: flex; flex-direction: column; align-items: center; width: 100%; padding-top: 0.5rem;">
     
-    <!-- Шапка с таймером -->
     <div class="level-header">
         <h2 class="level-title">🧩 Уровень 2</h2>
         <div class="d-flex align-items-center gap-2">
@@ -264,7 +252,6 @@
         </div>
     </div>
 
-    <!-- 🔥 Пазл 3×3: контейнер отцентрирован через margin: 0 auto + flex -->
     <div class="puzzle-wrapper">
         <div class="puzzle-grid">
             <div class="cell" data-pos="0" ondrop="drop(event)" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)"></div>
@@ -279,13 +266,11 @@
         </div>
     </div>
 
-    <!-- Кнопка завершения -->
     <button id="btnFinish" class="btn-finish" onclick="goToIndex()">
         ✅ Завершить уровень
     </button>
 </div>
 
-<!-- Скрытые изображения для инициализации -->
 <div id="hiddenImages" style="display: none;">
     <img src="{{ url_for('static', filename='images/level2/1.png') }}" data-num="1" id="img1" draggable="true" ondragstart="drag(event)">
     <img src="{{ url_for('static', filename='images/level2/2.png') }}" data-num="2" id="img2" draggable="true" ondragstart="drag(event)">
@@ -298,7 +283,6 @@
     <img src="{{ url_for('static', filename='images/level2/9.png') }}" data-num="9" id="img9" draggable="true" ondragstart="drag(event)">
 </div>
 
-<!-- 🔥 КАСТОМНАЯ МОДАЛКА -->
 <div id="winModal" class="custom-modal" onclick="handleModalClick(event)">
     <div class="custom-modal-content">
         <div class="modal-icon">🎉</div>
@@ -374,7 +358,6 @@
 
         if (!targetCell || !draggedEl) return;
 
-        // Меняем местами картинки
         const existingImg = targetCell.querySelector("img");
         const originCell = draggedEl.parentNode;
         
@@ -385,7 +368,6 @@
             targetCell.appendChild(draggedEl);
         }
 
-        // Проверка победы
         if (checkWin()) {
             onWin();
         }
@@ -417,16 +399,13 @@
         return wins.some(w => w.every((val, i) => val === state[i]));
     }
 
-    // 🔥 Обработка победы
     function onWin() {
         gameFinished = true;
         const time = stopTimer();
         
-        // Визуальные эффекты победы
         document.getElementById('timer').classList.add('finished');
         document.getElementById('timer').textContent = '🏆 ' + formatTime(time);
         
-        // Блокируем перетаскивание
         document.querySelectorAll(".cell img").forEach(img => {
             img.setAttribute("draggable", "false");
         });
@@ -434,15 +413,12 @@
             cell.style.pointerEvents = "none";
         });
         
-        // Показываем кнопку "Домой"
         document.getElementById("btnHome").style.display = "flex";
         document.getElementById("btnFinish").style.display = "none";
         
-        // Показываем модалку
         document.getElementById('finalTime').textContent = formatTime(time);
         document.getElementById('winModal').classList.add('show');
         
-        // Сохраняем результат
         saveResultToServer(time);
     }
 
@@ -472,6 +448,8 @@
     }
 
     function saveResultToServer(timeSeconds) {
+        console.log('📤 Отправка результата:', timeSeconds);
+        
         fetch('/api/save_level_result', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -482,11 +460,60 @@
             })
         })
         .then(response => response.json())
-        .then(data => console.log('Результат сохранён:', data))
-        .catch(error => console.error('Ошибка при сохранении:', error));
+        .then(data => {
+            console.log('✅ Ответ сервера:', data);
+            
+            if (data.success) {
+                if (data.is_new_record) {
+                    showRecordNotification(data.points, data.time_formatted);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('❌ Ошибка:', error);
+        });
     }
 
-    // 🔥 Закрытие кастомной модалки
+    function showRecordNotification(points, timeFormatted) {
+        const notification = document.createElement('div');
+        notification.className = 'record-notification';
+        notification.innerHTML = `
+            <div style="
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: linear-gradient(135deg, #fbbf24, #f59e0b);
+                color: white;
+                padding: 12px 24px;
+                border-radius: 12px;
+                font-weight: 600;
+                font-size: 14px;
+                box-shadow: 0 8px 25px rgba(251, 191, 36, 0.5);
+                z-index: 2000;
+                animation: slideDown 0.3s ease, fadeOut 0.3s ease 2.7s;
+            ">
+                🏆 Новый рекорд! ${points} баллов за ${timeFormatted}
+            </div>
+            <style>
+                @keyframes slideDown {
+                    from { top: -60px; opacity: 0; }
+                    to { top: 20px; opacity: 1; }
+                }
+                @keyframes fadeOut {
+                    from { opacity: 1; }
+                    to { opacity: 0; }
+                }
+            </style>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+
     function closeWinModal() {
         const modal = document.getElementById('winModal');
         modal.classList.remove('show');
