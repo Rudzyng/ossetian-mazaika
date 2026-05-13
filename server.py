@@ -164,8 +164,7 @@ def save_level_result():
         return jsonify({'success': False, 'error': 'Invalid data'}), 400
     
     points = calculate_points(time_seconds)
-    
-    # 🔥 Если пользователь авторизован — сохраняем в БД
+
     if current_user.is_authenticated:
         db_sess = db_session.create_session()
         user = db_sess.get(User, current_user.id)
