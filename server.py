@@ -1,10 +1,12 @@
 from flask import Flask, render_template, redirect, url_for, request, jsonify, session
 from forms.LoginForm import LoginForm
 from data.User import User
+from data.GameResult import GameResult
 from data import db_session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_restful import abort
 import requests
+import datetime
 
 from constants import APP_SECRET_KEY
 from utils.get_points import get_points
@@ -109,6 +111,46 @@ def points():
             session["error"] = e
 
     return redirect(url_for("index"))
+
+
+@app.route('/api/save_level_result', methods=['POST'])
+def save_level_result():
+    data = request.get_json()
+
+    if not data:
+        return jsonify({'success': False, 'error': 'No data'}), 400
+
+    level = data.get('level')
+    time_seconds = data.get('time_seconds')
+    time_formatted = data.get('time_formatted')
+
+    if level not in [1, 2] or time_seconds is None:
+        return jsonify({'success': False}), 400
+
+    if 'level_results' not in session:
+        session['level_results'] = {}
+    
+    session['level_results'][f'level_{level}'] = {
+        'time_seconds': time_seconds,
+        'time_formatted': time_formatted,
+        'timestamp': datetime.datetime.utcnow().isoformat()
+    }
+    session.modified = True
+    if current_user.is_authenticated:
+        db_sess = db_session.create_session()
+        result = GameResult(
+            user_id=current_user.id,
+            level_id=0,
+            time_seconds=time_seconds
+        )
+        db_sess.add(result)
+        db_sess.commit()
+
+    return jsonify({
+        'success': True,
+        'message': 'Результат сохранён',
+        'time': time_formatted
+    })
 
 
 if __name__ == "__main__":

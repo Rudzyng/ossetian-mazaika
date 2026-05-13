@@ -12,8 +12,6 @@ class GameResult(SqlAlchemyBase):
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"), nullable=True)
     level_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("levels.id"), nullable=False)
     time_seconds = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
-    moves_count = sqlalchemy.Column(sqlalchemy.Integer, default=0)
-    completed_at = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.utcnow)
 
     level = orm.relationship("Level", backref="results")
     user = orm.relationship("User", backref="results")
