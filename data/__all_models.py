@@ -1,1 +1,1 @@
-from . import Level, PuzzlePart, User, GameResult
+from . import Level, PuzzlePart, User
