@@ -43,16 +43,12 @@ def create_app():
     Фабрика для создания экземпляра веб-приложения.
     Инициализирует все компоненты игры.
     """
-    # 1. Создаем экземпляр приложения
     app = Flask(__name__)
 
-    # 2. Загружаем конфигурацию
     app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 
-    # 3. Инициализируем игровые компоненты (раскомментируйте по необходимости)
-    login_manager.init_app(app)  # если есть система входа
-    db_session.global_init("db/mozaika.db") # если есть база данных
-    # game_engine.init(app)                # ваш игровой движок
+    login_manager.init_app(app)
+    db_session.global_init("db/mozaika.db")
     return app
 
 
@@ -154,24 +150,24 @@ def save_level_result():
     data = request.get_json()
     if not data:
         return jsonify({'success': False, 'error': 'No data'}), 400
-    
+
     level = data.get('level')
     time_seconds = data.get('time_seconds')
     time_formatted = data.get('time_formatted')
-    
+
     if level not in [1, 2] or time_seconds is None:
         return jsonify({'success': False, 'error': 'Invalid data'}), 400
-    
+
     points = calculate_points(time_seconds)
 
     if current_user.is_authenticated:
         db_sess = db_session.create_session()
         user = db_sess.get(User, current_user.id)
-        
+
         if user:
             score_field = 'level1' if level == 1 else 'level2'
             current_best = getattr(user, score_field)
-            
+
             if current_best is None or points > current_best:
                 setattr(user, score_field, points)
                 db_sess.commit()
@@ -192,14 +188,14 @@ def save_level_result():
     print("sfsdfsdf")
     if 'level_results' not in session:
         session['level_results'] = {}
-    
+
     session['level_results'][f'level_{level}'] = {
         'points': points,
         'time_formatted': time_formatted,
         'timestamp': datetime.utcnow().isoformat()
     }
     session.modified = True
-    
+
     return jsonify({
         'success': True,
         'message': 'Результат сохранён временно (войдите для постоянного сохранения)',
