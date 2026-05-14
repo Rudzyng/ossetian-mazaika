@@ -1,0 +1,344 @@
+{% extends "base.html" %}
+
+{% block head %}
+{{ super() }}
+<title>{{ level.name }}</title>
+<style>
+    .puzzle-wrapper {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 10px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: fit-content;
+        margin: 0 auto;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .puzzle-grid {
+        display: grid;
+        grid-template-columns: repeat({{ grid_size }}, minmax(150px, 200px));
+        grid-template-rows: repeat({{ grid_size }}, minmax(150px, 200px));
+        gap: 10px;
+    }
+
+    .cell {
+        border: 2px dashed rgba(173, 181, 189, 0.8);
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+
+    .cell.drag-over {
+        background: rgba(102, 126, 234, 0.15);
+        border-style: solid;
+        border-color: #667eea;
+    }
+
+    .cell img {
+        max-width: 100%;
+        max-height: 100%;
+        cursor: grab;
+        border-radius: 6px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        user-select: none;
+        transition: transform 0.15s ease;
+    }
+
+    .cell img:active {
+        cursor: grabbing;
+        transform: scale(1.03);
+    }
+
+    .timer-display {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #374151;
+        background: white;
+        padding: 0.4rem 1rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+
+    .btn-home {
+        margin-left: 8px;
+        background: white;
+        border: 2px solid #e5e7eb;
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        border-radius: 0.5rem;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    .level-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding: 0 4px;
+        width: 100%;
+        max-width: 500px;
+        box-sizing: border-box;
+    }
+    
+    .level-title {
+        font-size: 1.3rem;
+        font-weight: 800;
+        color: white;
+        margin: 0;
+        text-shadow: 0 1px 4px rgba(0,0,0,0.25);
+    }
+
+    .custom-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.25s ease;
+    }
+    
+    .custom-modal.show {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .custom-modal-content {
+        background: white;
+        border-radius: 1.25rem;
+        padding: 1.5rem;
+        text-align: center;
+        transform: scale(0.95);
+        transition: transform 0.25s ease;
+    }
+    
+    .custom-modal.show .custom-modal-content {
+        transform: scale(1);
+    }
+    
+    .modal-btn {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 0.75rem;
+        cursor: pointer;
+        margin-top: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="display: flex; flex-direction: column; align-items: center; width: 100%; padding-top: 0.5rem;">
+    
+    <div class="level-header">
+        <h2 class="level-title">🧩 {{ level.name }}</h2>
+        <div class="d-flex align-items-center gap-2">
+            <span id="timer" class="timer-display">00:00</span>
+            <button id="btnHome" class="btn-home" onclick="goBack()" style="display: none;">🏠</button>
+        </div>
+    </div>
+
+    <div class="puzzle-wrapper">
+        <div class="puzzle-grid" id="puzzleGrid">
+            {% for i in range(grid_size * grid_size) %}
+            <div class="cell" data-pos="{{ i }}" 
+                 ondrop="drop(event)" 
+                 ondragover="allowDrop(event)" 
+                 ondragenter="dragEnter(event)" 
+                 ondragleave="dragLeave(event)"></div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div id="winModal" class="custom-modal">
+    <div class="custom-modal-content">
+        <div class="modal-icon">🎉</div>
+        <h3>Пазл собран!</h3>
+        <p>Время: <span id="finalTime"></span></p>
+        <button class="modal-btn" onclick="closeWinModal()">Продолжить</button>
+    </div>
+</div>
+
+<script>
+    // Данные частей из сервера
+    const partsData = {{ parts | tojson }};
+    const gridSize = {{ grid_size }};
+    const totalParts = gridSize * gridSize;
+
+    let timerInterval = null;
+    let startTime = null;
+    let gameFinished = false;
+
+    // Создаём изображения
+    let images = [];
+    for (let i = 0; i < totalParts; i++) {
+        const img = document.createElement('img');
+        // Используем путь, который пришёл с сервера
+        img.src = partsData[i].image;
+        img.dataset.num = partsData[i].num;
+        img.id = `img_${i}`;
+        img.draggable = true;
+        img.ondragstart = drag;
+        images.push(img);
+    }
+
+    function formatTime(seconds) {
+        const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+        const s = (seconds % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
+    }
+
+    function startTimer() {
+        startTime = Date.now();
+        timerInterval = setInterval(() => {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            document.getElementById('timer').textContent = formatTime(elapsed);
+        }, 1000);
+    }
+
+    function stopTimer() {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+        return Math.floor((Date.now() - startTime) / 1000);
+    }
+
+    function shuffle(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+    }
+
+    function allowDrop(ev) {
+        if (gameFinished) return;
+        ev.preventDefault();
+    }
+
+    function dragEnter(ev) {
+        if (gameFinished) return;
+        ev.preventDefault();
+        const cell = ev.target.closest('.cell');
+        if (cell) cell.classList.add('drag-over');
+    }
+
+    function dragLeave(ev) {
+        const cell = ev.target.closest('.cell');
+        if (cell) cell.classList.remove('drag-over');
+    }
+
+    function drag(ev) {
+        if (gameFinished) return;
+        ev.dataTransfer.setData("id", ev.target.id);
+    }
+
+    function drop(ev) {
+        if (gameFinished) return;
+        ev.preventDefault();
+
+        const cell = ev.target.closest('.cell');
+        if (cell) cell.classList.remove('drag-over');
+
+        const draggedId = ev.dataTransfer.getData("id");
+        const draggedEl = document.getElementById(draggedId);
+        let targetCell = ev.target.closest('.cell');
+
+        if (!targetCell || !draggedEl) return;
+
+        const existingImg = targetCell.querySelector("img");
+        const originCell = draggedEl.parentNode;
+
+        if (existingImg && existingImg !== draggedEl) {
+            originCell.appendChild(existingImg);
+            targetCell.appendChild(draggedEl);
+        } else if (!existingImg) {
+            targetCell.appendChild(draggedEl);
+        }
+
+        if (checkWin()) {
+            onWin();
+        }
+    }
+
+    function getState() {
+        const cells = document.querySelectorAll(".cell");
+        let state = [];
+        cells.forEach(cell => {
+            const img = cell.querySelector("img");
+            state.push(img ? Number(img.dataset.num) : null);
+        });
+        return state;
+    }
+
+    function checkWin() {
+        const state = getState();
+        // Правильное состояние: числа от 1 до totalParts по порядку
+        const target = Array.from({length: totalParts}, (_, i) => i + 1);
+        return target.every((val, i) => val === state[i]);
+    }
+
+    function onWin() {
+        gameFinished = true;
+        const time = stopTimer();
+
+        document.getElementById('timer').textContent = '🏆 ' + formatTime(time);
+        document.getElementById('btnHome').style.display = "flex";
+
+        document.getElementById('finalTime').textContent = formatTime(time);
+        document.getElementById('winModal').classList.add('show');
+
+        // Без сохранения результатов
+    }
+
+    function initGame() {
+        const cells = document.querySelectorAll(".cell");
+
+        // Перемешиваем изображения
+        let shuffled = [...images];
+        let valid = false;
+        while (!valid) {
+            shuffle(shuffled);
+            // Проверяем что не совпадает с правильным порядком
+            const isWin = shuffled.every((img, i) => Number(img.dataset.num) === i + 1);
+            if (!isWin) valid = true;
+        }
+
+        cells.forEach((cell, i) => {
+            cell.innerHTML = "";
+            cell.appendChild(shuffled[i]);
+        });
+
+        startTimer();
+    }
+
+    function closeWinModal() {
+        document.getElementById('winModal').classList.remove('show');
+    }
+
+    function goBack() {
+        window.location.href = "/";
+    }
+
+    document.addEventListener('DOMContentLoaded', initGame);
+</script>
+{% endblock %}
