@@ -10,9 +10,16 @@ class User(SqlAlchemyBase, UserMixin):
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     email = sqlalchemy.Column(sqlalchemy.String, index=True, unique=True, nullable=False)
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    level1 = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
+    level2 = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
 
     def check_password(self, password):
         return check_password_hash(self.hashed_password, password)
+
+    @property
+    def name(self):
+        """Для совместимости со старыми шаблонами"""
+        return self.email.split('@')[0]

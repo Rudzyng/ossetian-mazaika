@@ -91,15 +91,15 @@ def login():
         API_login(email, password)
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.email == email).first()
+
         if not user:
             user = User(
-                name=email.split('@')[0],
-                surname="",
                 email=email
             )
             user.set_password(password)
             db_sess.add(user)
             db_sess.commit()
+
         login_user(user)
 
         return redirect(url_for("index"))
