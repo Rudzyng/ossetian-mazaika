@@ -13,5 +13,6 @@ class PuzzlePart(SqlAlchemyBase):
 
     image_file = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     word_ossetian = sqlalchemy.Column(sqlalchemy.String, nullable=False)
+    part_number = sqlalchemy.Column(sqlalchemy.Integer, nullable=False, default=0)
 
     level = orm.relationship("Level", back_populates="parts")
