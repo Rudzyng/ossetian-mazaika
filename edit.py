@@ -36,7 +36,9 @@ def load_user(user_id):
 
 @app.route('/')
 def index():
-    return render_template('editor_index.html', user=current_user)
+    db_sess = db_session.create_session()
+    levels = db_sess.query(Level).all()
+    return render_template('editor_index.html', levels=levels, user=current_user)
 
 
 @app.route('/create_level', methods=['GET', 'POST'])
