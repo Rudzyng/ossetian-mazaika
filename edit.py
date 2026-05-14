@@ -19,6 +19,7 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
