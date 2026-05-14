@@ -47,47 +47,107 @@ def create_level():
     if request.method == 'GET':
         return render_template('create_level_form.html')
 
-    try:
-        level_name = request.form.get('level_name')
-        grid_size = int(request.form.get('grid_size', 2))
+    if request.method == 'POST':
+        try:
+            level_name = request.form.get('level_name')
+            grid_size = int(request.form.get('grid_size', 2))
 
-        if not level_name:
-            flash('Название уровня обязательно', 'error')
+            if not level_name:
+                flash('Название уровня обязательно', 'error')
+                return redirect(url_for('create_level'))
+
+            total_parts = grid_size * grid_size
+            total_pairs = total_parts * 2
+
+            words = []
+            images = []
+
+            for i in range(total_pairs):
+                word = request.form.get(f'word_{i}')
+                image = request.files.get(f'image_{i}')
+
+                if word:
+                    words.append(word)
+                if image:
+                    images.append(image)
+
+            db_sess = db_session.create_session()
+
+            level = Level()
+            level.name = level_name
+            level.grid_size = grid_size
+            db_sess.add(level)
+            db_sess.flush()
+
+            from generate.constants_generate import IMAGE_WIDTH, IMAGE_HEIGHT, FORMAT_IMAGE, DIR, DIRECTORY_IMAGES
+
+            temp_images_dir = os.path.join(DIR, DIRECTORY_IMAGES)
+            os.makedirs(temp_images_dir, exist_ok=True)
+
+            for idx, image in enumerate(images):
+                ext = os.path.splitext(image.filename)[1]
+                filename = f"{idx + 1}{ext if ext else '.png'}"
+                filepath = os.path.join(temp_images_dir, filename)
+                image.save(filepath)
+
+            level_folder_name = f"level_{level.id}"
+            final_dir = os.path.join('static', 'custom_levels', level_folder_name)
+            os.makedirs(final_dir, exist_ok=True)
+
+            if grid_size == 2:
+                from generate.generate_2 import generate_2
+                generate_2(
+                    IMAGE_WIDTH, IMAGE_HEIGHT,
+                    DIRECTORY_IMAGES,
+                    "square.png",
+                    f"../static/custom_levels/{level_folder_name}",
+                    words,
+                    FORMAT_IMAGE
+                )
+
+                for i in range(4):
+                    part = PuzzlePart()
+                    part.level_id = level.id
+                    part.image_file = f"custom_levels/{level_folder_name}/{i + 1}{FORMAT_IMAGE}"
+                    part.word_ossetian = words[i] if i < len(words) else ""
+                    part.part_number = i
+                    db_sess.add(part)
+
+            elif grid_size == 3:
+                from generate.generate_3 import generate_3
+                generate_3(
+                    IMAGE_WIDTH, IMAGE_HEIGHT,
+                    DIRECTORY_IMAGES,
+                    "square.png",
+                    f"../static/custom_levels/{level_folder_name}",
+                    words,
+                    FORMAT_IMAGE
+                )
+
+                for i in range(9):
+                    part = PuzzlePart()
+                    part.level_id = level.id
+                    part.image_file = f"custom_levels/{level_folder_name}/{i + 1}{FORMAT_IMAGE}"
+                    part.word_ossetian = words[i] if i < len(words) else ""
+                    part.part_number = i
+                    db_sess.add(part)
+
+            db_sess.commit()
+
+            import shutil
+            shutil.rmtree(temp_images_dir, ignore_errors=True)
+
+            flash(f'Уровень "{level_name}" успешно создан!', 'success')
+            return redirect(url_for('index'))
+
+        except Exception as e:
+            print(f"Ошибка: {e}")
+            import traceback
+            traceback.print_exc()
+            flash(f'Ошибка при создании уровня: {str(e)}', 'error')
             return redirect(url_for('create_level'))
 
-        db_sess = db_session.create_session()
-
-        level = Level()
-        level.name = level_name
-        level.grid_size = grid_size
-
-        db_sess.add(level)
-        db_sess.flush()
-
-        total_parts = grid_size * grid_size
-        for i in range(total_parts):
-            part = PuzzlePart()
-            part.level_id = level.id
-            part.word_ossetian = request.form.get(f'word_ossetian_{i}')
-            # или если несколько слов через запятую:
-            # part.words = request.form.get(f'words_{i}')
-
-            # Сохраняем картинку
-            image_file = request.files.get(f'image_{i}')
-            if image_file:
-                filename = secure_filename(f"level_{level.id}_part_{i}_{image_file.filename}")
-                image_file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                part.image_file = f"uploads/{filename}"
-
-            db_sess.add(part)
-
-        db_sess.commit()
-        flash(f'Уровень "{level_name}" успешно создан!', 'success')
-        return redirect(url_for('index'))
-
-    except Exception as e:
-        flash(f'Ошибка при создании уровня: {str(e)}', 'error')
-        return redirect(url_for('create_level'))
+    return render_template('create_level_form.html')
 
 
 @app.route('/edit_level/<int:level_id>', methods=['GET', 'POST'])
