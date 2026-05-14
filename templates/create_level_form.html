@@ -2,264 +2,200 @@
 
 {% block head %}
 {{ super() }}
-<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <style>
-    @keyframes float {
-        0%, 100% { transform: translateY(0) rotate(0deg); }
-        50% { transform: translateY(-6px) rotate(1deg); }
-    }
-
-    .page-wrapper {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 1rem;
-        gap: 1rem;
-        position: relative;
-        z-index: 10;
-    }
-
-    .create-title {
-        font-size: 1.4rem !important;
-        font-weight: 800;
-        color: white;
-        text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
-        text-align: center;
-        animation: float 3s ease-in-out infinite;
-    }
-
     .create-form {
         background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border-radius: 1.25rem;
-        padding: 1.2rem;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #374151;
+    }
+
+    .form-control {
         width: 100%;
-        max-width: 500px;
-        max-height: 70vh;
-        overflow-y: auto;
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-        border: 1px solid rgba(255, 255, 255, 0.4);
-    }
-
-    .form-section {
-        background: rgba(255, 255, 255, 0.6);
-        border-radius: 0.875rem;
-        padding: 0.8rem;
-        margin-bottom: 0.8rem;
-    }
-
-    .form-section-title {
+        padding: 0.75rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 0.5rem;
         font-size: 1rem;
-        font-weight: 700;
-        color: #1f2937;
-        margin-bottom: 0.8rem;
-        border-bottom: 2px solid #667eea;
-        padding-bottom: 0.3rem;
-        display: flex;
-        align-items: center;
-        gap: 0.4rem;
     }
 
-    .form-label {
+    .form-control:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+
+    .size-selector {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .size-btn {
+        flex: 1;
+        padding: 0.75rem;
+        background: #f3f4f6;
+        border: 2px solid #e5e7eb;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        text-align: center;
+        font-weight: 600;
+    }
+
+    .size-btn.active {
+        background: #667eea;
+        border-color: #667eea;
+        color: white;
+    }
+
+    .items-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+        max-height: 500px;
+        overflow-y: auto;
+        padding: 0.5rem;
+    }
+
+    .item-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.75rem;
+        padding: 1rem;
+    }
+
+    .item-card label {
         font-size: 0.8rem;
         font-weight: 600;
-        color: #374151;
-        margin-bottom: 0.2rem;
+        color: #6b7280;
+        margin-bottom: 0.25rem;
         display: block;
     }
 
-    .form-input {
+    .item-card input {
         width: 100%;
-        padding: 0.6rem 0.8rem;
-        font-size: 14px;
-        border: 2px solid #e5e7eb;
-        border-radius: 0.75rem;
-        transition: all 0.2s ease;
-        background: white;
-        margin-bottom: 0.8rem;
+        margin-bottom: 0.75rem;
+        padding: 0.5rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
     }
 
-    .form-input:focus {
-        outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+    .item-card input[type="file"] {
+        padding: 0.25rem;
     }
 
-    .parts-container {
-        display: flex;
-        flex-direction: column;
-        gap: 0.8rem;
-        max-height: 400px;
-        overflow-y: auto;
-        padding: 0.2rem;
-    }
-
-    .part-card {
-        background: white;
-        border-radius: 0.75rem;
-        padding: 0.8rem;
-        border: 1px solid #e5e7eb;
-        transition: all 0.2s ease;
-    }
-
-    .part-card:hover {
-        border-color: #667eea;
-        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
-    }
-
-    .part-header {
-        font-size: 0.9rem;
-        font-weight: 700;
-        color: #667eea;
-        margin-bottom: 0.6rem;
-        display: flex;
-        align-items: center;
-        gap: 0.3rem;
-    }
-
-    .btn-create {
-        width: 100%;
-        padding: 0.8rem;
-        border-radius: 0.875rem;
-        font-size: 14px;
-        font-weight: 700;
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    .btn-submit {
+        background: linear-gradient(135deg, #10b981, #059669);
         color: white;
+        padding: 0.75rem 1.5rem;
         border: none;
-        cursor: pointer;
-        transition: all 0.25s ease;
-        margin-top: 0.5rem;
-    }
-
-    .btn-create:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 7px 20px rgba(16, 185, 129, 0.5);
-    }
-
-    .btn-secondary {
-        background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
-        margin-top: 0.5rem;
-        text-align: center;
-        display: inline-block;
-        text-decoration: none;
-    }
-
-    .alert {
-        padding: 0.75rem 1rem;
         border-radius: 0.75rem;
-        margin-bottom: 0.5rem;
-        font-size: 0.85rem;
-    }
-
-    .alert-error {
-        background: #fee2e2;
-        color: #991b1b;
-        border-left: 4px solid #ef4444;
-    }
-
-    .alert-success {
-        background: #d1fae5;
-        color: #065f46;
-        border-left: 4px solid #10b981;
-    }
-
-    .icon {
+        font-weight: bold;
+        cursor: pointer;
         font-size: 1rem;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+    }
+
+    .help-text {
+        font-size: 0.8rem;
+        color: #6b7280;
+        margin-top: 0.25rem;
+    }
+
+    .info-badge {
+        background: #dbeafe;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+        font-size: 0.85rem;
+        color: #1e40af;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="page-wrapper">
-    <h1 class="create-title">
-        <span style="font-size: 1.6rem;">🎨</span>
-        Создание нового уровня
-    </h1>
+<div class="create-form">
+    <h2 style="text-align: center; margin-bottom: 1rem;">🎨 Создание нового уровня</h2>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
+    <div class="info-badge">
+        💡 Для создания уровня нужно загрузить пары "картинка + слово". Количество пар = размер пазла × 2
+    </div>
 
-    <form method="POST" enctype="multipart/form-data" class="create-form">
-        <div class="form-section">
-            <div class="form-section-title">
-                <span class="icon">📋</span>
-                Информация об уровне
-            </div>
-
-            <label class="form-label">Название уровня (на осетинском):</label>
-            <input type="text" class="form-input" name="level_name" required placeholder="например: Цӕрӕгойтӕ">
-
-            <label class="form-label">Размер сетки:</label>
-            <select class="form-input" id="grid_size" name="grid_size" required>
-                <option value="2">2x2 (4 части) - Легкий</option>
-                <option value="3">3x3 (9 частей) - Средний</option>
-                <option value="4">4x4 (16 частей) - Сложный</option>
-                <option value="5">5x5 (25 частей) - Эксперт</option>
-            </select>
+    <form method="POST" enctype="multipart/form-data" id="createForm">
+        <div class="form-group">
+            <label>Название уровня:</label>
+            <input type="text" name="level_name" class="form-control" required placeholder="例如: Цӕрӕгойтӕ">
         </div>
 
-        <div class="form-section">
-            <div class="form-section-title">
-                <span class="icon">🧩</span>
-                Части пазла
-                <span id="partsCount" style="font-size: 0.7rem; color: #667eea;"></span>
+        <div class="form-group">
+            <label>Размер пазла:</label>
+            <div class="size-selector">
+                <div class="size-btn" data-size="2">2×2 (4 части)</div>
+                <div class="size-btn" data-size="3">3×3 (9 частей)</div>
+                <div class="size-btn" data-size="4">4×4 (16 частей)</div>
             </div>
-            <div id="parts-container" class="parts-container">
-                <div style="text-align: center; padding: 2rem; color: #9ca3af;">Выберите размер сетки</div>
-            </div>
+            <input type="hidden" name="grid_size" id="grid_size" value="2">
         </div>
 
-        <button type="submit" class="btn-create">
-            <span class="icon">💾</span> Создать уровень
-        </button>
-        <a href="/" class="btn-create btn-secondary" style="display: block; text-align: center;">
-            <span class="icon">🏠</span> Отмена
-        </a>
+        <div id="items-container" class="items-grid"></div>
+
+        <div style="text-align: center; margin-top: 1.5rem;">
+            <button type="submit" class="btn-submit">✨ Создать уровень</button>
+        </div>
     </form>
 </div>
 
 <script>
-    const gridSizeSelect = document.getElementById('grid_size');
-    const partsContainer = document.getElementById('parts-container');
+    let currentSize = 2;
 
-    function generatePartFields() {
-        const size = parseInt(gridSizeSelect.value);
-        const totalParts = size * size;
+    // Выбор размера
+    document.querySelectorAll('.size-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentSize = parseInt(btn.dataset.size);
+            document.getElementById('grid_size').value = currentSize;
+            generateItems();
+        });
+    });
 
-        document.getElementById('partsCount').textContent = `(всего ${totalParts} частей)`;
+    // Генерация полей для элементов
+    function generateItems() {
+        const totalParts = currentSize * currentSize;
+        const totalPairs = totalParts * 2;  // на каждую часть 2 элемента (картинка + слово)
 
-        partsContainer.innerHTML = '';
+        const container = document.getElementById('items-container');
+        container.innerHTML = '';
 
-        for (let i = 0; i < totalParts; i++) {
-            const partHtml = `
-                <div class="part-card">
-                    <div class="part-header">
-                        <span class="icon">🧩</span>
-                        Часть ${i + 1} / ${totalParts}
-                    </div>
-                    <div>
-                        <label class="form-label">Слово на осетинском:</label>
-                        <input type="text" class="form-input" name="word_ossetian_${i}" required>
-                    </div>
-                    <div>
-                        <label class="form-label">Изображение:</label>
-                        <input type="file" class="form-input" name="image_${i}" accept="image/*" required>
-                        <small style="color: #6b7280; font-size: 0.65rem;">Рекомендуемый размер: квадратное изображение</small>
-                    </div>
+        for (let i = 0; i < totalPairs; i++) {
+            const pairHtml = `
+                <div class="item-card">
+                    <span style="font-size: 0.75rem; color: #667eea; display: block; margin-bottom: 0.5rem;">Элемент ${i+1} из ${totalPairs}</span>
+                    <label>🖼️ Картинка</label>
+                    <input type="file" name="image_${i}" accept="image/*" required>
+                    <label>📖 Слово на осетинском</label>
+                    <input type="text" name="word_${i}" placeholder="例如: гæды" required>
                 </div>
             `;
-            partsContainer.innerHTML += partHtml;
+            container.innerHTML += pairHtml;
         }
     }
 
-    gridSizeSelect.addEventListener('change', generatePartFields);
-    document.addEventListener('DOMContentLoaded', generatePartFields);
+    document.addEventListener('DOMContentLoaded', generateItems);
 </script>
 {% endblock %}
