@@ -200,6 +200,29 @@ def delete_level(level_id):
     return redirect(url_for('index'))
 
 
+@app.route('/play_custom_level/<int:level_id>')
+def play_custom_level(level_id):
+    db_sess = db_session.create_session()
+    level = db_sess.query(Level).get(level_id)
+
+    if not level:
+        flash('Уровень не найден', 'error')
+        return redirect(url_for('index'))
+
+    parts = []
+    for part in sorted(level.parts, key=lambda p: p.part_number):
+        parts.append({
+            'num': part.part_number + 1,
+            'image': f"/static/{part.image_file}",
+            'word': part.word_ossetian
+        })
+
+    return render_template('play_custom_level.html',
+                           level=level,
+                           parts=parts,
+                           grid_size=level.grid_size)
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == "GET":
@@ -220,19 +243,15 @@ def login():
         if not user:
             user = User()
             user.email = email
-            user.name = email.split('@')[0]
-            user.surname = ""
             user.set_password(password)
             db_sess.add(user)
             db_sess.commit()
 
         login_user(user)
 
-        # Сохраняем в сессию для обратной совместимости
         session["user_id"] = user.id
         session["user_email"] = user.email
 
-        flash(f'Добро пожаловать, {user.name}!', 'success')
         return redirect(url_for("index"))
 
     except requests.exceptions.RequestException as e:
