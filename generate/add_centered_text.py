@@ -1,5 +1,4 @@
 from PIL import Image, ImageDraw, ImageFont
-from constants_generate import *
 
 
 def add_centered_text(image, text, center_x, center_y, font, color=(0, 0, 0)):

@@ -1,13 +1,9 @@
 from PIL import Image, ImageFont
-from constants_generate import *
-from add_centered_text import add_centered_text
+from .add_centered_text import add_centered_text
+import os
 
 
-def generate_3(img_width, img_height, image_direct, path_sq, final_direct, comp, format="png"):
-    # нумерация в блоке:
-    #    1
-    #  0   2
-    #    3
+def generate_3(img_width, img_height, images_dir, square_path, output_dir, words, format="png"):
     rotations = [-90, 0, 90, 0]
     coords_for_image = [(0, img_height), (img_width, 0), (2 * img_width, img_height), (img_width, img_height * 2)]
     indexes_images = [(0, 2), (1, 3), (0, 1), (1, 3), (0, 2), (1, 2), (0, 2, 3), (1, 2), (1,)]
@@ -17,90 +13,108 @@ def generate_3(img_width, img_height, image_direct, path_sq, final_direct, comp,
     field_text = [["", "", "", ""] for _ in range(9)]
 
     count_text = 0
-    font = ImageFont.truetype(DIR + "fonts/candara.ttf", 56)
+
+    # Шрифт
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    font_path = os.path.join(current_dir, "fonts", "candara.ttf")
+    if not os.path.exists(font_path):
+        possible_fonts = [
+            "C:/Windows/Fonts/arial.ttf",
+            "C:/Windows/Fonts/tahoma.ttf",
+            "C:/Windows/Fonts/calibri.ttf",
+        ]
+        for pf in possible_fonts:
+            if os.path.exists(pf):
+                font_path = pf
+                break
+
+    try:
+        font = ImageFont.truetype(font_path, 56)
+        print(f"Шрифт загружен: {font_path}")
+    except:
+        font = ImageFont.load_default()
+
+    # Заполняем слова
     for i in range(9):
         for j in range(len(pairs[i])):
             x, y = pairs[i][j]
-            field_text[x][y] = comp[count_text]
+            field_text[x][y] = words[count_text]
             count_text += 1
 
     counter_img = 1
     for i in range(9):
-        background = Image.open(DIR + path_sq)
+        # Фон конвертируем в RGB
+        background = Image.open(square_path).convert('RGB')
+
         if len(indexes_images[i]) == 2:
-            overlay1 = Image.open(DIR + f"{image_direct}/{counter_img}{format}")
-            rotated1 = overlay1.rotate(rotations[indexes_images[i][0]])
-            background.paste(rotated1, coords_for_image[indexes_images[i][0]], rotated1)
-            counter_img += 1
+            # Две картинки
+            for img_idx in range(2):
+                overlay_path = os.path.join(images_dir, f"{counter_img}.png")
+                if not os.path.exists(overlay_path):
+                    for ext in ['.jpg', '.jpeg']:
+                        test_path = os.path.join(images_dir, f"{counter_img}{ext}")
+                        if os.path.exists(test_path):
+                            overlay_path = test_path
+                            break
+                overlay = Image.open(overlay_path).convert('RGB')
+                rotated = overlay.rotate(rotations[indexes_images[i][img_idx]])
+                background.paste(rotated, coords_for_image[indexes_images[i][img_idx]])
+                counter_img += 1
 
-            overlay2 = Image.open(DIR + f"{image_direct}/{counter_img}{format}")
-            rotated2 = overlay2.rotate(rotations[indexes_images[i][1]])
-            background.paste(rotated2, coords_for_image[indexes_images[i][1]], rotated2)
-            counter_img += 1
+            # Два текста
+            for txt_idx in range(2):
+                y_coord = 100 if indexes_text[i][txt_idx] != 3 else 500
+                text = field_text[i][indexes_text[i][txt_idx]]
+                background = background.rotate(rotations[indexes_text[i][txt_idx]])
+                add_centered_text(background, text, background.width // 2, y_coord, font)
+                background = background.rotate(-rotations[indexes_text[i][txt_idx]])
 
-            y_coord = 100
-            text1 = field_text[i][indexes_text[i][0]]
-            background = background.rotate(rotations[indexes_text[i][0]])
-            if indexes_text[i][0] == 3:
-                y_coord = 500
-            add_centered_text(background, text1, background.width // 2, y_coord, font)
-            background = background.rotate(-rotations[indexes_text[i][0]])
-
-            text2 = field_text[i][indexes_text[i][1]]
-            background = background.rotate(rotations[indexes_text[i][1]])
-            if indexes_text[i][1] == 3:
-                y_coord = 500
-            add_centered_text(background, text2, background.width // 2, y_coord, font)
-            background = background.rotate(-rotations[indexes_text[i][1]])
         elif len(indexes_images[i]) == 1:
-            overlay1 = Image.open(DIR + f"{image_direct}/{counter_img}{format}")
-            rotated1 = overlay1.rotate(rotations[indexes_images[i][0]])
-            background.paste(rotated1, coords_for_image[indexes_images[i][0]], rotated1)
+            # Одна картинка
+            overlay_path = os.path.join(images_dir, f"{counter_img}.png")
+            if not os.path.exists(overlay_path):
+                for ext in ['.jpg', '.jpeg']:
+                    test_path = os.path.join(images_dir, f"{counter_img}{ext}")
+                    if os.path.exists(test_path):
+                        overlay_path = test_path
+                        break
+            overlay = Image.open(overlay_path).convert('RGB')
+            rotated = overlay.rotate(rotations[indexes_images[i][0]])
+            background.paste(rotated, coords_for_image[indexes_images[i][0]])
             counter_img += 1
 
-            y_coord = 100
-            text1 = field_text[i][indexes_text[i][0]]
-            background = background.rotate(rotations[indexes_text[i][0]])
-            if indexes_text[i][0] == 3:
-                y_coord = 500
-            add_centered_text(background, text1, background.width // 2, y_coord, font)
-            background = background.rotate(-rotations[indexes_text[i][0]])
+            # Три текста
+            for txt_idx in range(3):
+                y_coord = 100 if indexes_text[i][txt_idx] != 3 else 500
+                text = field_text[i][indexes_text[i][txt_idx]]
+                background = background.rotate(rotations[indexes_text[i][txt_idx]])
+                add_centered_text(background, text, background.width // 2, y_coord, font)
+                background = background.rotate(-rotations[indexes_text[i][txt_idx]])
 
-            text2 = field_text[i][indexes_text[i][1]]
-            background = background.rotate(rotations[indexes_text[i][1]])
-            if indexes_text[i][1] == 3:
-                y_coord = 500
-            add_centered_text(background, text2, background.width // 2, y_coord, font)
-            background = background.rotate(-rotations[indexes_text[i][1]])
-
-            text3 = field_text[i][indexes_text[i][2]]
-            background = background.rotate(rotations[indexes_text[i][2]])
-            if indexes_text[i][2] == 3:
-                y_coord = 500
-            add_centered_text(background, text3, background.width // 2, y_coord, font)
-            background = background.rotate(-rotations[indexes_text[i][2]])
         else:
-            overlay1 = Image.open(DIR + f"{image_direct}/{counter_img}{format}")
-            rotated1 = overlay1.rotate(rotations[indexes_images[i][0]])
-            background.paste(rotated1, coords_for_image[indexes_images[i][0]], rotated1)
-            counter_img += 1
+            # Три картинки
+            for img_idx in range(3):
+                overlay_path = os.path.join(images_dir, f"{counter_img}.png")
+                if not os.path.exists(overlay_path):
+                    for ext in ['.jpg', '.jpeg']:
+                        test_path = os.path.join(images_dir, f"{counter_img}{ext}")
+                        if os.path.exists(test_path):
+                            overlay_path = test_path
+                            break
+                overlay = Image.open(overlay_path).convert('RGB')
+                rotated = overlay.rotate(rotations[indexes_images[i][img_idx]])
+                background.paste(rotated, coords_for_image[indexes_images[i][img_idx]])
+                counter_img += 1
 
-            overlay2 = Image.open(DIR + f"{image_direct}/{counter_img}{format}")
-            rotated2 = overlay2.rotate(rotations[indexes_images[i][1]])
-            background.paste(rotated2, coords_for_image[indexes_images[i][1]], rotated2)
-            counter_img += 1
-
-            overlay3 = Image.open(DIR + f"{image_direct}/{counter_img}{format}")
-            rotated3 = overlay3.rotate(rotations[indexes_images[i][2]])
-            background.paste(rotated3, coords_for_image[indexes_images[i][2]], rotated3)
-            counter_img += 1
-
-            y_coord = 100
-            text1 = field_text[i][indexes_text[i][0]]
+            # Один текст
+            y_coord = 100 if indexes_text[i][0] != 3 else 500
+            text = field_text[i][indexes_text[i][0]]
             background = background.rotate(rotations[indexes_text[i][0]])
-            if indexes_text[i][0] == 3:
-                y_coord = 500
-            add_centered_text(background, text1, background.width // 2, y_coord, font)
+            add_centered_text(background, text, background.width // 2, y_coord, font)
             background = background.rotate(-rotations[indexes_text[i][0]])
 
-        background.save(DIR + f'{final_direct}/{i + 1}{format}')
+        # Сохраняем результат
+        output_path = os.path.join(output_dir, f"{i + 1}{format}")
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        background.save(output_path)
+        print(f"Сохранено: {output_path}")

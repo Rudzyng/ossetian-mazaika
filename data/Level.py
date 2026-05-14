@@ -1,3 +1,4 @@
+# data/Level.py
 import sqlalchemy
 from sqlalchemy import orm
 from datetime import datetime
@@ -9,9 +10,11 @@ class Level(SqlAlchemyBase):
     __tablename__ = 'levels'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
-    name = sqlalchemy.Column(sqlalchemy.String, nullable=False)  # Название на осетинском
+    name = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     grid_size = sqlalchemy.Column(sqlalchemy.Integer, nullable=False, default=2)
     created_at = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.utcnow)
+
+    user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"), nullable=False, default=1)
 
     parts = orm.relationship("PuzzlePart", back_populates="level",
                              cascade="all, delete-orphan",

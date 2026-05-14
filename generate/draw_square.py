@@ -1,5 +1,5 @@
 from PIL import Image, ImageDraw, ImageFont
-from constants_generate import *
+from .constants_generate import *
 
 
 def draw_square(final_file, wid=SQUARE_WIDTH):

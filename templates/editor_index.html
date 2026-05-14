@@ -96,11 +96,6 @@
         color: white;
     }
 
-    .btn-edit {
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-        color: white;
-    }
-
     .btn-delete {
         background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
         color: white;
@@ -231,7 +226,7 @@
     </div>
 
     <div class="levels-list">
-        <h3 style="font-size: 1rem; margin-bottom: 0.8rem; color: #374151;">📋 Существующие уровни</h3>
+        <h3 style="font-size: 1rem; margin-bottom: 0.8rem; color: #374151;">📋 Мои уровни</h3>
 
         {% if levels %}
             {% for level in levels %}
@@ -247,9 +242,6 @@
                     <a href="/play_custom_level/{{ level.id }}" class="btn-icon btn-play" title="Играть">
                         🎮
                     </a>
-                    <a href="/edit_level/{{ level.id }}" class="btn-icon btn-edit" title="Редактировать">
-                        ✏️
-                    </a>
                     <button onclick="deleteLevel({{ level.id }}, '{{ level.name }}')" class="btn-icon btn-delete" title="Удалить">
                         🗑️
                     </button>
@@ -259,7 +251,7 @@
         {% else %}
             <div class="empty-state">
                 <span style="font-size: 2rem;">📭</span>
-                <p>Нет созданных уровней</p>
+                <p>У вас нет созданных уровней</p>
                 <p style="font-size: 0.8rem;">Создайте свой первый уровень!</p>
             </div>
         {% endif %}
