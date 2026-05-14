@@ -52,7 +52,6 @@ def create_app():
         return render_template('editor_index.html', levels=levels, user=current_user)
 
     @app.route('/create_level', methods=['GET', 'POST'])
-    @login_required
     def create_level():
         if request.method == 'GET':
             return render_template('create_level_form.html')
@@ -215,7 +214,6 @@ def create_app():
             return redirect(url_for('create_level'))
 
     @app.route('/delete_level/<int:level_id>')
-    @login_required
     def delete_level(level_id):
         from data import db_session
         from data.Level import Level
