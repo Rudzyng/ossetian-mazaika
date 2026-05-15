@@ -125,6 +125,7 @@
         font-size: 0.85rem;
         color: #1e40af;
     }
+
 </style>
 {% endblock %}
 
@@ -162,7 +163,6 @@
 <script>
     let currentSize = 2;
 
-    // Выбор размера
     document.querySelectorAll('.size-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
@@ -173,10 +173,9 @@
         });
     });
 
-    // Генерация полей для элементов
     function generateItems() {
         const totalParts = currentSize * currentSize;
-        const totalPairs = totalParts * 2;  // на каждую часть 2 элемента (картинка + слово)
+        const totalPairs = totalParts * 2;
 
         const container = document.getElementById('items-container');
         container.innerHTML = '';
@@ -196,5 +195,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', generateItems);
+
 </script>
 {% endblock %}

@@ -1,9 +1,9 @@
 from PIL import Image, ImageDraw, ImageFont
-from constants_generate import *
-from draw_square import draw_square
-from add_centered_text import add_centered_text
-from generate_2 import generate_2
-from generate_3 import generate_3
+from generate.constants_generate import *
+from generate.draw_square import draw_square
+from generate.add_centered_text import add_centered_text
+from generate.generate_2 import generate_2
+from generate.generate_3 import generate_3
 
 if __name__ == "__main__":
     dict_comp = ["фыркъа", "гæды", "куыдз", "къуда уыры", "хæфс", "тигр", "бæлон", "маймули", "халон", "сæгъ", "арс", "бирæгъ", "рувас", "тæрхъус", "тыртына", "тæхсæл", "пыл", "мыст"]

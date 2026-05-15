@@ -56,6 +56,11 @@
         transform: scale(1.03);
     }
 
+    .cell img[draggable="false"] {
+        cursor: default;
+        opacity: 0.95;
+    }
+
     .timer-display {
         font-size: 1.2rem;
         font-weight: 700;
@@ -65,6 +70,12 @@
         border-radius: 0.75rem;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         text-align: center;
+    }
+
+    .timer-display.finished {
+        color: #065f46;
+        background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+        box-shadow: 0 0 0 2px #10b981, 0 4px 12px rgba(16, 185, 129, 0.3);
     }
 
     .btn-home {
@@ -92,7 +103,7 @@
         max-width: 500px;
         box-sizing: border-box;
     }
-    
+
     .level-title {
         font-size: 1.3rem;
         font-weight: 800;
@@ -114,12 +125,12 @@
         visibility: hidden;
         transition: all 0.25s ease;
     }
-    
+
     .custom-modal.show {
         opacity: 1;
         visibility: visible;
     }
-    
+
     .custom-modal-content {
         background: white;
         border-radius: 1.25rem;
@@ -128,11 +139,22 @@
         transform: scale(0.95);
         transition: transform 0.25s ease;
     }
-    
+
     .custom-modal.show .custom-modal-content {
         transform: scale(1);
     }
-    
+
+    .modal-icon {
+        font-size: 3rem;
+        margin-bottom: 0.5rem;
+        animation: bounce 0.6s ease;
+    }
+
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
     .modal-btn {
         background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         color: white;
@@ -142,12 +164,14 @@
         cursor: pointer;
         margin-top: 1rem;
     }
+
+
 </style>
 {% endblock %}
 
 {% block content %}
 <div style="display: flex; flex-direction: column; align-items: center; width: 100%; padding-top: 0.5rem;">
-    
+
     <div class="level-header">
         <h2 class="level-title">🧩 {{ level.name }}</h2>
         <div class="d-flex align-items-center gap-2">
@@ -159,17 +183,17 @@
     <div class="puzzle-wrapper">
         <div class="puzzle-grid" id="puzzleGrid">
             {% for i in range(grid_size * grid_size) %}
-            <div class="cell" data-pos="{{ i }}" 
-                 ondrop="drop(event)" 
-                 ondragover="allowDrop(event)" 
-                 ondragenter="dragEnter(event)" 
+            <div class="cell" data-pos="{{ i }}"
+                 ondrop="drop(event)"
+                 ondragover="allowDrop(event)"
+                 ondragenter="dragEnter(event)"
                  ondragleave="dragLeave(event)"></div>
             {% endfor %}
         </div>
     </div>
 </div>
 
-<div id="winModal" class="custom-modal" onclick="handleModalClick(event)">
+<div id="winModal" class="custom-modal">
     <div class="custom-modal-content">
         <div class="modal-icon">🎉</div>
         <h3>Пазл собран!</h3>
@@ -179,7 +203,6 @@
 </div>
 
 <script>
-    // Данные частей из сервера
     const partsData = {{ parts | tojson }};
     const gridSize = {{ grid_size }};
     const totalParts = gridSize * gridSize;
@@ -188,34 +211,6 @@
     let startTime = null;
     let gameFinished = false;
 
-    // Определяем победные комбинации в зависимости от размера пазла
-    let winStates = [];
-
-    if (totalParts === 4) {
-        // Для уровня 2x2 (4 части)
-        winStates = [
-            [1, 2, 3, 4], [2, 1, 4, 3],
-            [3, 4, 1, 2], [4, 3, 2, 1]
-        ];
-    } else if (totalParts === 9) {
-        // Для уровня 3x3 (9 частей)
-        winStates = [
-            [1, 2, 3, 4, 5, 6, 7, 8, 9],
-            [2, 3, 1, 5, 6, 4, 8, 9, 7],
-            [3, 1, 2, 6, 4, 5, 9, 7, 8],
-            [4, 5, 6, 7, 8, 9, 1, 2, 3],
-            [5, 6, 4, 8, 9, 7, 2, 3, 1],
-            [6, 4, 5, 9, 7, 8, 3, 1, 2],
-            [7, 8, 9, 1, 2, 3, 4, 5, 6],
-            [8, 9, 7, 2, 3, 1, 5, 6, 4],
-            [9, 7, 8, 3, 1, 2, 6, 4, 5]
-        ];
-    } else {
-        // Для других размеров - порядок по возрастанию
-        winStates = [Array.from({length: totalParts}, (_, i) => i + 1)];
-    }
-
-    // Создаём изображения
     let images = [];
     for (let i = 0; i < totalParts; i++) {
         const img = document.createElement('img');
@@ -307,7 +302,7 @@
     }
 
     function getState() {
-        const cells = document.querySelectorAll(".cell");
+        const cells = document.querySelectorAll("#puzzleGrid .cell");
         let state = [];
         cells.forEach(cell => {
             const img = cell.querySelector("img");
@@ -316,45 +311,80 @@
         return state;
     }
 
+    function isWinningState(state) {
+        if (gridSize === 2) {
+            const winStates = [
+                [1, 2, 3, 4], [2, 1, 4, 3],
+                [3, 4, 1, 2], [4, 3, 2, 1]
+            ];
+            return winStates.some(win => win.every((val, i) => val === state[i]));
+        }
+
+        if (gridSize === 3) {
+            const wins = [
+                [1, 2, 3, 4, 5, 6, 7, 8, 9],
+                [2, 3, 1, 5, 6, 4, 8, 9, 7],
+                [3, 1, 2, 6, 4, 5, 9, 7, 8],
+                [4, 5, 6, 7, 8, 9, 1, 2, 3],
+                [5, 6, 4, 8, 9, 7, 2, 3, 1],
+                [6, 4, 5, 9, 7, 8, 3, 1, 2],
+                [7, 8, 9, 1, 2, 3, 4, 5, 6],
+                [8, 9, 7, 2, 3, 1, 5, 6, 4],
+                [9, 7, 8, 3, 1, 2, 6, 4, 5]
+            ];
+            return wins.some(w => w.every((val, i) => val === state[i]));
+        }
+
+        const target = Array.from({length: totalParts}, (_, i) => i + 1);
+        return target.every((val, i) => val === state[i]);
+    }
+
     function checkWin() {
-        const state = getState();
-        // Проверяем, соответствует ли текущее состояние одной из победных комбинаций
-        return winStates.some(win => win.every((val, i) => val === state[i]));
+        return isWinningState(getState());
     }
 
     function onWin() {
-        if (gameFinished) return;
         gameFinished = true;
         const time = stopTimer();
 
+        document.getElementById('timer').classList.add('finished');
         document.getElementById('timer').textContent = '🏆 ' + formatTime(time);
-        document.getElementById('btnHome').style.display = "flex";
 
+        document.querySelectorAll("#puzzleGrid .cell img").forEach(img => {
+            img.setAttribute("draggable", "false");
+        });
+
+        document.getElementById('btnHome').style.display = "flex";
         document.getElementById('finalTime').textContent = formatTime(time);
         document.getElementById('winModal').classList.add('show');
     }
 
     function initGame() {
-        const cells = document.querySelectorAll(".cell");
+        const cells = document.querySelectorAll("#puzzleGrid .cell");
 
-        // Перемешиваем изображения так, чтобы начальное состояние не было победным
         let shuffled = [...images];
-        let valid = false;
         let attempts = 0;
-        while (!valid && attempts < 100) {
+        let isWin = true;
+
+        // Перемешиваем до тех пор, пока не получим НЕвыигрышную комбинацию
+        while (isWin && attempts < 1000) {
             shuffle(shuffled);
-            // Проверяем, что не совпадает с победными комбинациями
-            const currentState = shuffled.map(img => Number(img.dataset.num));
-            const isWin = winStates.some(win => win.every((val, i) => val === currentState[i]));
-            if (!isWin) valid = true;
+
+            // Временно вставляем в DOM для проверки
+            cells.forEach((cell, i) => {
+                cell.innerHTML = "";
+                cell.appendChild(shuffled[i].cloneNode(true));
+            });
+
+            isWin = isWinningState(getState());
             attempts++;
         }
 
+        // Если за 1000 попыток не нашли невыигрышную — оставляем как есть
+        // и вставляем оригиналы (не клоны)
         cells.forEach((cell, i) => {
             cell.innerHTML = "";
-            if (shuffled[i]) {
-                cell.appendChild(shuffled[i]);
-            }
+            cell.appendChild(shuffled[i]);
         });
 
         startTimer();
@@ -364,16 +394,12 @@
         document.getElementById('winModal').classList.remove('show');
     }
 
-    function handleModalClick(event) {
-        if (event.target.id === 'winModal') {
-            closeWinModal();
-        }
-    }
-
     function goBack() {
         window.location.href = "/";
     }
 
     document.addEventListener('DOMContentLoaded', initGame);
+
+
 </script>
 {% endblock %}

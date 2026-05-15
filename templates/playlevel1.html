@@ -77,7 +77,7 @@
         text-align: center;
         transition: all 0.3s ease;
     }
-    
+
     .timer-display.finished {
         color: #065f46;
         background: linear-gradient(135deg, #d1fae5, #a7f3d0);
@@ -97,8 +97,9 @@
         align-items: center;
         justify-content: center;
         transition: all 0.2s ease;
+        cursor: pointer;
     }
-    
+
     .btn-home:hover {
         background: #f9fafb;
         border-color: #667eea;
@@ -120,12 +121,12 @@
         transition: all 0.25s ease;
         cursor: pointer;
     }
-    
+
     .btn-finish:hover {
         transform: translateY(-2px);
         box-shadow: 0 7px 20px rgba(251, 191, 36, 0.5);
     }
-    
+
     .btn-finish:disabled {
         opacity: 0.6;
         cursor: not-allowed;
@@ -142,7 +143,7 @@
         max-width: 430px;
         box-sizing: border-box;
     }
-    
+
     .level-title {
         font-size: 1.3rem;
         font-weight: 800;
@@ -165,12 +166,12 @@
         transition: all 0.25s ease;
         padding: 1rem;
     }
-    
+
     .custom-modal.show {
         opacity: 1;
         visibility: visible;
     }
-    
+
     .custom-modal-content {
         background: white;
         border-radius: 1.25rem;
@@ -183,42 +184,42 @@
         transition: transform 0.25s ease;
         border: 1px solid rgba(255, 255, 255, 0.5);
     }
-    
+
     .custom-modal.show .custom-modal-content {
         transform: scale(1);
     }
-    
+
     .modal-icon {
         font-size: 3rem;
         margin-bottom: 0.5rem;
         animation: bounce 0.6s ease;
     }
-    
+
     @keyframes bounce {
         0%, 100% { transform: translateY(0); }
         50% { transform: translateY(-10px); }
     }
-    
+
     .modal-title {
         font-size: 1.4rem;
         font-weight: 800;
         color: #065f46;
         margin: 0 0 0.5rem;
     }
-    
+
     .modal-text {
         color: #6b7280;
         margin: 0 0 0.25rem;
         font-size: 0.95rem;
     }
-    
+
     .modal-time {
         font-size: 1.3rem;
         font-weight: 700;
         color: #059669;
         margin: 0.75rem 0 1.25rem;
     }
-    
+
     .modal-btn {
         background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         color: white;
@@ -231,17 +232,19 @@
         transition: all 0.2s ease;
         box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
     }
-    
+
     .modal-btn:hover {
         transform: translateY(-2px);
         box-shadow: 0 7px 20px rgba(16, 185, 129, 0.5);
     }
+
+
 </style>
 {% endblock %}
 
 {% block content %}
 <div style="display: flex; flex-direction: column; align-items: center; width: 100%; padding-top: 0.5rem;">
-    
+
     <div class="level-header">
         <h2 class="level-title">🧩 Уровень 1</h2>
         <div class="d-flex align-items-center gap-2">
@@ -254,17 +257,25 @@
 
     <div class="puzzle-wrapper">
         <div class="puzzle-grid">
-            <div class="cell" data-pos="0" ondrop="drop(event)" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)">
-                <img src="{{ url_for('static', filename='images/level1/1.png') }}" data-num="1" id="img1" draggable="true" ondragstart="drag(event)">
+            <div class="cell" data-pos="0" ondrop="drop(event)" ondragover="allowDrop(event)"
+                 ondragenter="dragEnter(event)" ondragleave="dragLeave(event)">
+                <img src="{{ url_for('static', filename='images/level1/1.png') }}" data-num="1" id="img1"
+                     draggable="true" ondragstart="drag(event)">
             </div>
-            <div class="cell" data-pos="1" ondrop="drop(event)" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)">
-                <img src="{{ url_for('static', filename='images/level1/2.png') }}" data-num="2" id="img2" draggable="true" ondragstart="drag(event)">
+            <div class="cell" data-pos="1" ondrop="drop(event)" ondragover="allowDrop(event)"
+                 ondragenter="dragEnter(event)" ondragleave="dragLeave(event)">
+                <img src="{{ url_for('static', filename='images/level1/2.png') }}" data-num="2" id="img2"
+                     draggable="true" ondragstart="drag(event)">
             </div>
-            <div class="cell" data-pos="2" ondrop="drop(event)" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)">
-                <img src="{{ url_for('static', filename='images/level1/3.png') }}" data-num="3" id="img3" draggable="true" ondragstart="drag(event)">
+            <div class="cell" data-pos="2" ondrop="drop(event)" ondragover="allowDrop(event)"
+                 ondragenter="dragEnter(event)" ondragleave="dragLeave(event)">
+                <img src="{{ url_for('static', filename='images/level1/3.png') }}" data-num="3" id="img3"
+                     draggable="true" ondragstart="drag(event)">
             </div>
-            <div class="cell" data-pos="3" ondrop="drop(event)" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)">
-                <img src="{{ url_for('static', filename='images/level1/4.png') }}" data-num="4" id="img4" draggable="true" ondragstart="drag(event)">
+            <div class="cell" data-pos="3" ondrop="drop(event)" ondragover="allowDrop(event)"
+                 ondragenter="dragEnter(event)" ondragleave="dragLeave(event)">
+                <img src="{{ url_for('static', filename='images/level1/4.png') }}" data-num="4" id="img4"
+                     draggable="true" ondragstart="drag(event)">
             </div>
         </div>
     </div>
@@ -324,14 +335,14 @@
         if (gameFinished) return;
         ev.preventDefault();
     }
-    
+
     function dragEnter(ev) {
         if (gameFinished) return;
         ev.preventDefault();
         const cell = ev.target.closest('.cell');
         if (cell) cell.classList.add('drag-over');
     }
-    
+
     function dragLeave(ev) {
         const cell = ev.target.closest('.cell');
         if (cell) cell.classList.remove('drag-over');
@@ -346,7 +357,7 @@
     function drop(ev) {
         if (gameFinished) return;
         ev.preventDefault();
-        
+
         const cell = ev.target.closest('.cell');
         if (cell) cell.classList.remove('drag-over');
 
@@ -358,7 +369,7 @@
 
         const existingImg = targetCell.querySelector("img");
         const originCell = draggedEl.parentNode;
-        
+
         if (existingImg && existingImg !== draggedEl) {
             originCell.appendChild(existingImg);
             targetCell.appendChild(draggedEl);
@@ -381,8 +392,7 @@
         return state;
     }
 
-    function checkWin() {
-        const state = getState();
+    function isWinningState(state) {
         const winStates = [
             [1, 2, 3, 4], [2, 1, 4, 3],
             [3, 4, 1, 2], [4, 3, 2, 1]
@@ -390,121 +400,65 @@
         return winStates.some(win => win.every((val, i) => val === state[i]));
     }
 
+    function checkWin() {
+        return isWinningState(getState());
+    }
+
     function onWin() {
         gameFinished = true;
         const time = stopTimer();
-        
+
         document.getElementById('timer').classList.add('finished');
         document.getElementById('timer').textContent = '🏆 ' + formatTime(time);
-        
+
         document.querySelectorAll(".cell img").forEach(img => {
             img.setAttribute("draggable", "false");
         });
         document.querySelectorAll(".cell").forEach(cell => {
             cell.style.pointerEvents = "none";
         });
-        
+
         document.getElementById("btnHome").style.display = "flex";
         document.getElementById("btnFinish").style.display = "none";
-        
+
         document.getElementById('finalTime').textContent = formatTime(time);
         document.getElementById('winModal').classList.add('show');
-        
-        saveResultToServer(time);
     }
 
     function initGame() {
         const cells = document.querySelectorAll(".cell");
         const images = Array.from(document.querySelectorAll(".cell img"));
 
-        let valid = false;
-        while (!valid) {
+        let attempts = 0;
+        let isWin = true;
+
+        while (isWin && attempts < 1000) {
             shuffle(images);
             cells.forEach((cell, i) => {
                 cell.innerHTML = "";
-                cell.appendChild(images[i]);
+                cell.appendChild(images[i].cloneNode(true));
             });
-            if (!checkWin()) valid = true;
+            isWin = isWinningState(getState());
+            attempts++;
         }
-        startTimer();
-    }
 
-    function saveResultToServer(timeSeconds) {
-        console.log('📤 Отправка результата:', timeSeconds);
-        
-        fetch('/api/save_level_result', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                level: 1,
-                time_seconds: timeSeconds,
-                time_formatted: formatTime(timeSeconds)
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('✅ Ответ сервера:', data);
-            
-            if (data.success) {
-                if (data.is_new_record) {
-                    showRecordNotification(data.points, data.time_formatted);
-                }
-            }
-        })
-        .catch(error => {
-            console.error('❌ Ошибка:', error);
+        cells.forEach((cell, i) => {
+            cell.innerHTML = "";
+            cell.appendChild(images[i]);
         });
-    }
 
-    function showRecordNotification(points, timeFormatted) {
-        const notification = document.createElement('div');
-        notification.className = 'record-notification';
-        notification.innerHTML = `
-            <div style="
-                position: fixed;
-                top: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: linear-gradient(135deg, #fbbf24, #f59e0b);
-                color: white;
-                padding: 12px 24px;
-                border-radius: 12px;
-                font-weight: 600;
-                font-size: 14px;
-                box-shadow: 0 8px 25px rgba(251, 191, 36, 0.5);
-                z-index: 2000;
-                animation: slideDown 0.3s ease, fadeOut 0.3s ease 2.7s;
-            ">
-                🏆 Новый рекорд! ${points} баллов за ${timeFormatted}
-            </div>
-            <style>
-                @keyframes slideDown {
-                    from { top: -60px; opacity: 0; }
-                    to { top: 20px; opacity: 1; }
-                }
-                @keyframes fadeOut {
-                    from { opacity: 1; }
-                    to { opacity: 0; }
-                }
-            </style>
-        `;
-        
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.remove();
-        }, 3000);
+        startTimer();
     }
 
     function closeWinModal() {
         const modal = document.getElementById('winModal');
         modal.classList.remove('show');
-        
+
         setTimeout(() => {
             modal.style.display = 'none';
         }, 250);
     }
-    
+
     function handleModalClick(event) {
         if (event.target.id === 'winModal') {
             closeWinModal();
@@ -516,5 +470,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', initGame);
+
+
 </script>
 {% endblock %}

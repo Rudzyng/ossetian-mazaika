@@ -36,7 +36,7 @@
         border-radius: 1.25rem;
         padding: 1.2rem;
         width: 100%;
-        max-width: 500px;
+        max-width: 600px;
         max-height: 70vh;
         overflow-y: auto;
         box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
@@ -82,7 +82,7 @@
         border-color: #667eea;
     }
 
-    .part-card {
+    .item-card {
         background: white;
         border-radius: 0.75rem;
         padding: 0.8rem;
@@ -90,7 +90,7 @@
         border: 1px solid #e5e7eb;
     }
 
-    .part-header {
+    .item-header {
         font-weight: 700;
         color: #667eea;
         margin-bottom: 0.6rem;
@@ -141,6 +141,12 @@
         background: #f3f4f6;
         cursor: not-allowed;
     }
+
+    .help-text {
+        font-size: 0.75rem;
+        color: #6b7280;
+        margin-top: 0.25rem;
+    }
 </style>
 {% endblock %}
 
@@ -161,7 +167,7 @@
 
     <form method="POST" enctype="multipart/form-data" class="edit-form">
         <div class="form-section">
-            <div class="form-section-title">Основная информация</div>
+            <div class="form-section-title">📝 Основная информация</div>
 
             <label class="form-label">Название (осетинский):</label>
             <input type="text" class="form-input" name="level_name" value="{{ level.name }}" required>
@@ -172,19 +178,26 @@
         </div>
 
         <div class="form-section">
-            <div class="form-section-title">Части пазла</div>
-            {% for part in level.parts %}
-            <div class="part-card">
-                <div class="part-header">Часть {{ loop.index }}</div>
+            <div class="form-section-title">🖼️ Пары "картинка + слово"</div>
+            <small style="color: #6b7280; display: block; margin-bottom: 0.8rem;">
+                Всего {{ level.grid_size * level.grid_size * 2 }} пар. Для перегенерации пазла загрузите все картинки заново.
+            </small>
+
+            {% set total_pairs = level.grid_size * level.grid_size * 2 %}
+            {% for i in range(total_pairs) %}
+            <div class="item-card">
+                <div class="item-header">Пара {{ i + 1 }} из {{ total_pairs }}</div>
                 <div>
-                    <label class="form-label">Осетинское слово:</label>
-                    <input type="text" class="form-input" name="word_ossetian_{{ loop.index0 }}" value="{{ part.word_ossetian }}" required>
+                    <label class="form-label">📖 Слово на осетинском:</label>
+                    <input type="text" class="form-input" name="word_{{ i }}"
+                           value="{{ existing_words[i] if i < existing_words|length else '' }}"
+                           placeholder="例如: гæды">
                 </div>
                 <div>
-                    <label class="form-label">Новое изображение:</label>
-                    <input type="file" class="form-input" name="image_{{ loop.index0 }}" accept="image/*">
-                    {% if part.image_file %}
-                    <small style="color: #6b7280;">Текущее: {{ part.image_file.split('/')[-1] }}</small>
+                    <label class="form-label">🖼️ Картинка:</label>
+                    <input type="file" class="form-input" name="image_{{ i }}" accept="image/*">
+                    {% if i < existing_words|length %}
+                    <small style="color: #6b7280;">Текущее слово: {{ existing_words[i] }}</small>
                     {% endif %}
                 </div>
             </div>

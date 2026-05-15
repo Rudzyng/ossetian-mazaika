@@ -10,6 +10,6 @@ def add_centered_text(image, text, center_x, center_y, font, color=(0, 0, 0)):
 
     x = center_x - text_width // 2
     y = center_y - text_height // 2
-    
+
     draw.text((x, y), text, font=font, fill=color)
     return image

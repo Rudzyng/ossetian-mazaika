@@ -96,6 +96,11 @@
         color: white;
     }
 
+    .btn-edit {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+    }
+
     .btn-delete {
         background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
         color: white;
@@ -135,10 +140,6 @@
         color: #6b7280;
     }
 
-    .icon {
-        font-size: 1rem;
-    }
-
     .alert {
         padding: 0.75rem 1rem;
         border-radius: 0.75rem;
@@ -158,43 +159,6 @@
         border-left: 4px solid #ef4444;
     }
 
-    .user-badge {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border-radius: 0.75rem;
-        padding: 0.6rem 1rem;
-        margin-bottom: 0.5rem;
-        width: 100%;
-        max-width: 600px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-
-    .user-email {
-        font-weight: 600;
-        color: #1f2937;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.85rem;
-    }
-
-    .btn-logout {
-        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        color: white;
-        padding: 0.4rem 0.8rem;
-        border-radius: 0.5rem;
-        text-decoration: none;
-        font-size: 0.8rem;
-        font-weight: 600;
-    }
-
-    .btn-logout:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-    }
 </style>
 {% endblock %}
 
@@ -206,62 +170,54 @@
     </h1>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
     {% endwith %}
 
-    <div class="user-badge">
-        <div class="user-email">
-            <span>👤</span>
-            <span>{{ current_user.email if current_user.is_authenticated else 'Гость' }}</span>
-        </div>
-        {% if current_user.is_authenticated %}
-            <a href="/logout" class="btn-logout">Выйти</a>
-        {% else %}
-            <a href="/login" class="btn-logout" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">Войти</a>
-        {% endif %}
-    </div>
-
     <div class="levels-list">
-        <h3 style="font-size: 1rem; margin-bottom: 0.8rem; color: #374151;">📋 Мои уровни</h3>
+        <h3 style="font-size: 1rem; margin-bottom: 0.8rem; color: #374151;">📋 Существующие уровни</h3>
 
         {% if levels %}
-            {% for level in levels %}
-            <div class="level-item">
-                <div class="level-info">
-                    <div class="level-name">{{ level.name }}</div>
-                    <div class="level-meta">
-                        Размер: {{ level.grid_size }}x{{ level.grid_size }} |
-                        Частей: {{ level.parts|length }}
-                    </div>
-                </div>
-                <div class="level-actions">
-                    <a href="/play_custom_level/{{ level.id }}" class="btn-icon btn-play" title="Играть">
-                        🎮
-                    </a>
-                    <button onclick="deleteLevel({{ level.id }}, '{{ level.name }}')" class="btn-icon btn-delete" title="Удалить">
-                        🗑️
-                    </button>
+        {% for level in levels %}
+        <div class="level-item">
+            <div class="level-info">
+                <div class="level-name">{{ level.name }}</div>
+                <div class="level-meta">
+                    Размер: {{ level.grid_size }}x{{ level.grid_size }} |
+                    Частей: {{ level.parts|length }}
                 </div>
             </div>
-            {% endfor %}
+            <div class="level-actions">
+                <a href="/play_custom_level/{{ level.id }}" class="btn-icon btn-play" title="Играть">
+                    🎮
+                </a>
+                <a href="/edit_level/{{ level.id }}" class="btn-icon btn-edit" title="Редактировать">
+                    ✏️
+                </a>
+                <button onclick="deleteLevel({{ level.id }}, '{{ level.name }}')" class="btn-icon btn-delete"
+                        title="Удалить">
+                    🗑️
+                </button>
+            </div>
+        </div>
+        {% endfor %}
         {% else %}
-            <div class="empty-state">
-                <span style="font-size: 2rem;">📭</span>
-                <p>У вас нет созданных уровней</p>
-                <p style="font-size: 0.8rem;">Создайте свой первый уровень!</p>
-            </div>
+        <div class="empty-state">
+            <span style="font-size: 2rem;">📭</span>
+            <p>Нет созданных уровней</p>
+            <p style="font-size: 0.8rem;">Создайте свой первый уровень!</p>
+        </div>
         {% endif %}
 
         <a href="/create_level" class="btn-create-new">
-            <span class="icon">➕</span> Создать новый уровень
+            ➕ Создать новый уровень
         </a>
 
         <a href="/" class="btn-back">
-            <span class="icon">🏠</span> На главную
+            🏠 На главную
         </a>
     </div>
 </div>
@@ -272,5 +228,6 @@
             window.location.href = `/delete_level/${levelId}`;
         }
     }
+
 </script>
 {% endblock %}
