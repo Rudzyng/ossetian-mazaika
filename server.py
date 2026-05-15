@@ -9,19 +9,12 @@ db_session.global_init("db/mozaika.db")
 
 
 def calculate_points(time_seconds):
-    """Подсчёт баллов за время"""
-    if time_seconds < 10:
-        return 10
-    elif time_seconds < 20:
-        return 8
-    elif time_seconds < 30:
-        return 6
-    elif time_seconds < 40:
-        return 4
-    elif time_seconds < 60:
-        return 2
-    else:
-        return 0
+    thresholds = {10: 10, 20: 8, 30: 6, 40: 4, 60: 2}
+
+    for limit, points in thresholds.items():
+        if time_seconds < limit:
+            return points
+    return 0
 
 
 @app.route("/")
@@ -42,7 +35,7 @@ def play_level2():
 
 @app.route('/rules')
 def rules():
-    return render_template("base.html")
+    return render_template("rules.html")
 
 
 # @app.route('/api/save_level_result', methods=['POST'])

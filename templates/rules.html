@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block head %}
+{{ super() }}
+<title>📜 Правила игры — Осетинская мозаика</title>
+<style>
+    .rules-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 1.5rem;
+    }
+
+    .rules-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 1.25rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .rules-title {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #1f2937;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        border-bottom: 3px solid #667eea;
+        padding-bottom: 0.5rem;
+    }
+
+    .rules-subtitle {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #667eea;
+        margin: 1rem 0 0.5rem 0;
+    }
+
+    .rules-text {
+        color: #374151;
+        line-height: 1.6;
+        font-size: 1rem;
+    }
+
+    .rules-list {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    .rules-list li {
+        margin-bottom: 0.75rem;
+        padding-left: 1.5rem;
+        position: relative;
+    }
+
+    .rules-list li::before {
+        content: "🧩";
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+
+    .rules-badge {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 2rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-block;
+        margin-right: 0.5rem;
+    }
+
+    .points-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+    }
+
+    .points-table th,
+    .points-table td {
+        padding: 0.5rem;
+        text-align: center;
+        border: 1px solid #d1d5db;
+    }
+
+    .points-table th {
+        background: #667eea;
+        color: white;
+        font-weight: 600;
+    }
+
+    .points-table td {
+        background: white;
+    }
+
+    .btn-home-rules {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.75rem;
+        text-decoration: none;
+        font-weight: 600;
+        margin-top: 1rem;
+        transition: transform 0.2s;
+    }
+
+    .btn-home-rules:hover {
+        transform: translateY(-2px);
+    }
+
+    .win-states {
+        background: #f0fdf4;
+        border-left: 4px solid #10b981;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        margin: 1rem 0;
+        font-family: monospace;
+        font-size: 0.9rem;
+    }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="rules-container">
+    <div class="rules-card">
+        <div class="rules-title">
+            <span>📜</span>
+            Правила игры «Осетинская мозаика»
+        </div>
+
+        <div class="rules-text">
+            <p><strong>Цель игры</strong> — собрать мозаику (пазл), правильно сопоставив картинки с их названиями на
+                осетинском языке.</p>
+        </div>
+
+        <div class="rules-subtitle">🎮 Как играть</div>
+        <ul class="rules-list">
+            <li>На главном экране выбери уровень: <span class="rules-badge">Уровень 1</span> (2×2) или <span
+                    class="rules-badge">Уровень 2</span> (3×3)
+            </li>
+            <li>Части пазла перемешаны. Перетаскивай их мышкой или пальцем (drag-and-drop), чтобы поменять местами</li>
+            <li>Каждая часть — квадрат, разделённый диагоналями на 4 отдела. В каждом отделе — картинка или слово на
+                осетинском
+            </li>
+            <li>Чтобы собрать пазл правильно, нужно, чтобы <strong>слово из одной части совпадало с картинкой на
+                соседней части</strong> (на соприкасающихся отделах)
+            </li>
+            <li>Пазл <strong>зацикленный</strong> — части на границе соединяются с противоположными (верх с низом, лево
+                с правом)
+            </li>
+        </ul>
+
+        <div class="rules-subtitle">⏱️ Система баллов</div>
+        <table class="points-table">
+            <thead>
+            <tr>
+                <th>Время</th>
+                <th>Баллы</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Меньше 10 секунд</td>
+                <td>🏆 10 баллов</td>
+            </tr>
+            <tr>
+                <td>Меньше 20 секунд</td>
+                <td>8 баллов</td>
+            </tr>
+            <tr>
+                <td>Меньше 30 секунд</td>
+                <td>6 баллов</td>
+            </tr>
+            <tr>
+                <td>Меньше 40 секунд</td>
+                <td>4 балла</td>
+            </tr>
+            <tr>
+                <td>Меньше 60 секунд</td>
+                <td>2 балла</td>
+            </tr>
+            <tr>
+                <td>60 секунд и больше</td>
+                <td>0 баллов</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="rules-subtitle">🏆 Победа</div>
+        <div class="rules-text">
+            <p>Игра проверяет не только «классический» порядок, но и <strong>циклические сдвиги</strong>. Например, для
+                уровня 2×2 допустимы 4 правильных состояния:</p>
+        </div>
+        <div class="win-states">
+            1 2 &nbsp;&nbsp;&nbsp; 2 1 &nbsp;&nbsp;&nbsp; 3 4 &nbsp;&nbsp;&nbsp; 4 3<br>
+            3 4 &nbsp;&nbsp;&nbsp; 4 3 &nbsp;&nbsp;&nbsp; 1 2 &nbsp;&nbsp;&nbsp; 2 1
+        </div>
+        <div class="rules-text">
+            <p>Как только пазл собран верно — появится поздравительное окно с твоим временем!</p>
+        </div>
+
+        <div class="rules-subtitle">🛠️ Создание своих уровней</div>
+        <ul class="rules-list">
+            <li>Перейди в <strong>редактор уровней</strong> (доступен после входа через рудзынг.рф)</li>
+            <li>Нажми <span class="rules-badge">➕ Создать новый уровень</span></li>
+            <li>Выбери размер пазла (2×2 или 3×3)</li>
+            <li>Загрузи картинки и введи слова на осетинском (количество пар = размер × 2)</li>
+            <li>Система сама сгенерирует пазл с правильными соединениями</li>
+            <li>Твои уровни сохраняются и доступны для игры</li>
+        </ul>
+
+        <div class="rules-subtitle">📱 Интерфейс</div>
+        <ul class="rules-list">
+            <li>⏱️ <strong>Таймер</strong> — показывает текущее время сборки</li>
+            <li>🏠 <strong>Кнопка с домиком</strong> — возвращает на главный экран после победы</li>
+            <li>✅ <strong>«Завершить уровень»</strong> — прерывает игру (без сохранения результата)</li>
+        </ul>
+
+        <div style="text-align: center; margin-top: 1.5rem;">
+            <a href="/" class="btn-home-rules">
+                🏠 Вернуться на главную
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
