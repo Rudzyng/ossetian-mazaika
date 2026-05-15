@@ -134,110 +134,17 @@ def create_level():
     return render_template('create_level_form.html')
 
 
-@app.route('/edit_level/<int:level_id>', methods=['GET', 'POST'])
-def edit_level(level_id):
-    db_sess = db_session.create_session()
-    level = db_sess.query(Level).get(level_id)
-
-    if not level:
-        flash('Уровень не найден', 'error')
-        return redirect(url_for('index'))
-
-    if request.method == 'GET':
-        total_pairs = level.grid_size * level.grid_size * 2
-        existing_words = [""] * total_pairs
-
-        for part in level.parts:
-            if part.part_number < total_pairs:
-                existing_words[part.part_number] = part.word_ossetian
-
-        return render_template('edit_level_form.html', level=level, existing_words=existing_words)
-
-    try:
-        level.name = request.form.get('level_name', level.name)
-
-        total_pairs = level.grid_size * level.grid_size * 2
-        has_new_images = False
-        new_words = []
-
-        for i in range(total_pairs):
-            word = request.form.get(f'word_{i}', '')
-            new_words.append(word)
-            image_file = request.files.get(f'image_{i}')
-            if image_file and image_file.filename and allowed_file(image_file.filename):
-                has_new_images = True
-
-        for i, part in enumerate(level.parts):
-            if i < len(new_words):
-                part.word_ossetian = new_words[i]
-
-        if has_new_images:
-            from generate.constants_generate import IMAGE_WIDTH, IMAGE_HEIGHT, FORMAT_IMAGE, DIR, DIRECTORY_IMAGES
-
-            temp_images_dir = os.path.join(DIR, DIRECTORY_IMAGES)
-            os.makedirs(temp_images_dir, exist_ok=True)
-
-            for old_file in os.listdir(temp_images_dir):
-                os.remove(os.path.join(temp_images_dir, old_file))
-
-            saved_count = 0
-            for i in range(total_pairs):
-                image_file = request.files.get(f'image_{i}')
-                if image_file and image_file.filename and allowed_file(image_file.filename):
-                    ext = os.path.splitext(image_file.filename)[1]
-                    filename = f"{saved_count + 1}{ext if ext else '.png'}"
-                    filepath = os.path.join(temp_images_dir, filename)
-                    image_file.save(filepath)
-                    saved_count += 1
-
-            level_folder_name = f"level_{level.id}"
-            final_dir = os.path.join('static', 'custom_levels', level_folder_name)
-
-            if os.path.exists(final_dir):
-                for old_file in os.listdir(final_dir):
-                    os.remove(os.path.join(final_dir, old_file))
-            os.makedirs(final_dir, exist_ok=True)
-
-            if level.grid_size == 2:
-                from generate.generate_2 import generate_2
-                generate_2(
-                    IMAGE_WIDTH, IMAGE_HEIGHT,
-                    DIRECTORY_IMAGES,
-                    "square.png",
-                    f"../static/custom_levels/{level_folder_name}",
-                    new_words,
-                    FORMAT_IMAGE
-                )
-            elif level.grid_size == 3:
-                from generate.generate_3 import generate_3
-                generate_3(
-                    IMAGE_WIDTH, IMAGE_HEIGHT,
-                    DIRECTORY_IMAGES,
-                    "square.png",
-                    f"../static/custom_levels/{level_folder_name}",
-                    new_words,
-                    FORMAT_IMAGE
-                )
-
-            shutil.rmtree(temp_images_dir, ignore_errors=True)
-
-        db_sess.commit()
-        flash(f'Уровень "{level.name}" успешно обновлен!', 'success')
-
-    except Exception as e:
-        flash(f'Ошибка при обновлении: {str(e)}', 'error')
-        import traceback
-        traceback.print_exc()
-
-    return redirect(url_for('index'))
-
-
 @app.route('/delete_level/<int:level_id>')
 def delete_level(level_id):
     db_sess = db_session.create_session()
     level = db_sess.query(Level).get(level_id)
 
     if level:
+        level_folder_name = f"level_{level.id}"
+        final_dir = os.path.join('static', 'custom_levels', level_folder_name)
+        if os.path.exists(final_dir):
+            shutil.rmtree(final_dir)
+
         db_sess.delete(level)
         db_sess.commit()
         flash(f'Уровень "{level.name}" удален', 'success')
@@ -272,4 +179,4 @@ def play_custom_level(level_id):
 
 if __name__ == '__main__':
     db_session.global_init("db/mozaika.db")
-    app.run(debug=True, port=5001)
+    app.run(port=5001)
