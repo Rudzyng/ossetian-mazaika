@@ -2,8 +2,6 @@ import requests
 
 from flask import session
 from constants import API_SECRET_KEY, API_URL
-from utils.get_all_games import get_all_games
-
 
 
 def post_points(amount: int) -> int:

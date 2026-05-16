@@ -12,5 +12,5 @@ def ping():
 
     if response.status_code != 200:
         raise Exception("Сервер недоступен")
-    
+
     return response.json()

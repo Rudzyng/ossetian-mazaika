@@ -1,6 +1,6 @@
 import requests
 
-from flask import render_template, session
+from flask import session
 from constants import API_SECRET_KEY, API_URL
 
 
@@ -28,5 +28,5 @@ def get_points() -> int | None:
         return data
     elif isinstance(data, dict):
         return data.get("points")
-    
+
     return None
