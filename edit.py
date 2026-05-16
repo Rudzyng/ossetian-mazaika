@@ -117,15 +117,13 @@ def create_level():
 
             db_sess.commit()
 
-            shutil.rmtree(temp_images_dir, ignore_errors=True)
+            shutil.rmtree(temp_images_dir)
 
             flash(f'Уровень "{level_name}" успешно создан!', 'success')
             return redirect(url_for('index'))
 
         except Exception as e:
-            print(f"Ошибка: {e}")
-            import traceback
-            traceback.print_exc()
+            print(f"Ошибка при создании уровня: {e}")
             flash(f'Ошибка при создании уровня: {str(e)}', 'error')
             return redirect(url_for('create_level'))
 
