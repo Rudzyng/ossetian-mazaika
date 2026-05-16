@@ -1,4 +1,3 @@
-# data/Level.py
 import sqlalchemy
 from sqlalchemy import orm
 from datetime import datetime
