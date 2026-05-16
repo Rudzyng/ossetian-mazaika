@@ -94,7 +94,6 @@ def create_level():
                     part = PuzzlePart()
                     part.level_id = level.id
                     part.image_file = f"custom_levels/{level_folder_name}/{i + 1}{FORMAT_IMAGE}"
-                    part.word_ossetian = words[i] if i < len(words) else ""
                     part.part_number = i
                     db_sess.add(part)
 
@@ -113,7 +112,6 @@ def create_level():
                     part = PuzzlePart()
                     part.level_id = level.id
                     part.image_file = f"custom_levels/{level_folder_name}/{i + 1}{FORMAT_IMAGE}"
-                    part.word_ossetian = words[i] if i < len(words) else ""
                     part.part_number = i
                     db_sess.add(part)
 
@@ -167,8 +165,7 @@ def play_custom_level(level_id):
     for part in sorted(level.parts, key=lambda p: p.part_number):
         parts.append({
             'num': part.part_number + 1,
-            'image': f"/static/{part.image_file}",
-            'word': part.word_ossetian
+            'image': f"/static/{part.image_file}"
         })
 
     return render_template('play_custom_level.html',
