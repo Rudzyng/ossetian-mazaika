@@ -3,16 +3,18 @@
 {% block head %}
 {{ super() }}
 <title>{{ level.name }}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
 <style>
     .puzzle-wrapper {
         background: rgba(255, 255, 255, 0.95);
-        padding: 10px;
+        padding: 8px;
         border-radius: 12px;
         box-shadow: 0 4px 20px rgba(0,0,0,0.15);
         display: flex;
         justify-content: center;
         align-items: center;
         width: fit-content;
+        max-width: 95vw;
         margin: 0 auto;
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255,255,255,0.3);
@@ -20,9 +22,17 @@
 
     .puzzle-grid {
         display: grid;
-        grid-template-columns: repeat({{ grid_size }}, minmax(150px, 200px));
-        grid-template-rows: repeat({{ grid_size }}, minmax(150px, 200px));
-        gap: 10px;
+        {% if grid_size == 2 %}
+        grid-template-columns: repeat(2, minmax(120px, min(45vw, 300px)));
+        grid-template-rows: repeat(2, minmax(120px, min(45vw, 300px)));
+        {% elif grid_size == 3 %}
+        grid-template-columns: repeat(3, minmax(90px, min(30vw, 200px)));
+        grid-template-rows: repeat(3, minmax(90px, min(30vw, 200px)));
+        {% else %}
+        grid-template-columns: repeat({{ grid_size }}, minmax(80px, min({{ 90 // grid_size }}vw, 200px)));
+        grid-template-rows: repeat({{ grid_size }}, minmax(80px, min({{ 90 // grid_size }}vw, 200px)));
+        {% endif %}
+        gap: 8px;
     }
 
     .cell {
@@ -33,6 +43,9 @@
         align-items: center;
         justify-content: center;
         transition: all 0.2s ease;
+        touch-action: none;
+        -webkit-user-select: none;
+        user-select: none;
     }
 
     .cell.drag-over {
@@ -48,12 +61,20 @@
         border-radius: 6px;
         box-shadow: 0 3px 10px rgba(0,0,0,0.2);
         user-select: none;
+        -webkit-user-select: none;
         transition: transform 0.15s ease;
+        pointer-events: auto;
+        touch-action: none;
     }
 
     .cell img:active {
         cursor: grabbing;
         transform: scale(1.03);
+    }
+
+    .cell img.dragging {
+        opacity: 0.5;
+        transform: scale(0.95);
     }
 
     .cell img[draggable="false"] {
@@ -62,13 +83,14 @@
     }
 
     .timer-display {
-        font-size: 1.2rem;
+        font-size: clamp(0.85rem, 3vw, 1.2rem);
         font-weight: 700;
         color: #374151;
         background: white;
-        padding: 0.4rem 1rem;
+        padding: 0.35rem 0.8rem;
         border-radius: 0.75rem;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        min-width: 75px;
         text-align: center;
     }
 
@@ -79,33 +101,34 @@
     }
 
     .btn-home {
-        margin-left: 8px;
+        margin-left: 6px;
         background: white;
         border: 2px solid #e5e7eb;
-        width: 36px;
-        height: 36px;
+        width: clamp(28px, 8vw, 36px);
+        height: clamp(28px, 8vw, 36px);
         padding: 0;
         border-radius: 0.5rem;
-        font-size: 1.1rem;
+        font-size: clamp(0.9rem, 3vw, 1.1rem);
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
+        touch-action: manipulation;
     }
 
     .level-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 15px;
-        padding: 0 4px;
+        margin-bottom: 10px;
+        padding: 0 8px;
         width: 100%;
-        max-width: 500px;
+        max-width: 95vw;
         box-sizing: border-box;
     }
 
     .level-title {
-        font-size: 1.3rem;
+        font-size: clamp(1rem, 4vw, 1.3rem);
         font-weight: 800;
         color: white;
         margin: 0;
@@ -138,6 +161,8 @@
         text-align: center;
         transform: scale(0.95);
         transition: transform 0.25s ease;
+        max-width: min(320px, 90vw);
+        width: 100%;
     }
 
     .custom-modal.show .custom-modal-content {
@@ -145,7 +170,7 @@
     }
 
     .modal-icon {
-        font-size: 3rem;
+        font-size: clamp(2.5rem, 10vw, 3rem);
         margin-bottom: 0.5rem;
         animation: bounce 0.6s ease;
     }
@@ -163,11 +188,19 @@
         border-radius: 0.75rem;
         cursor: pointer;
         margin-top: 1rem;
+        font-weight: 600;
+        font-size: clamp(13px, 3.5vw, 14px);
+        touch-action: manipulation;
     }
 
-
-
-
+    .touch-feedback {
+        position: fixed;
+        pointer-events: none;
+        z-index: 9999;
+        opacity: 0.7;
+        transform: translate(-50%, -50%);
+        transition: none;
+    }
 </style>
 {% endblock %}
 
@@ -204,6 +237,8 @@
     </div>
 </div>
 
+<div id="touchClone" class="touch-feedback" style="display: none;"></div>
+
 <script>
     const partsData = {{ parts | tojson }};
     const gridSize = {{ grid_size }};
@@ -212,6 +247,12 @@
     let timerInterval = null;
     let startTime = null;
     let gameFinished = false;
+    let draggedImg = null;
+    let touchClone = null;
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchMoved = false;
+    let touchThreshold = 5;
 
     let images = [];
     for (let i = 0; i < totalParts; i++) {
@@ -221,6 +262,9 @@
         img.id = `img_${i}`;
         img.draggable = true;
         img.ondragstart = drag;
+        img.ontouchstart = touchStart;
+        img.ontouchmove = touchMove;
+        img.ontouchend = touchEnd;
         images.push(img);
     }
 
@@ -272,7 +316,8 @@
 
     function drag(ev) {
         if (gameFinished) return;
-        ev.dataTransfer.setData("id", ev.target.id);
+        draggedImg = ev.target;
+        ev.dataTransfer.setData("text/plain", ev.target.id);
     }
 
     function drop(ev) {
@@ -282,12 +327,16 @@
         const cell = ev.target.closest('.cell');
         if (cell) cell.classList.remove('drag-over');
 
-        const draggedId = ev.dataTransfer.getData("id");
+        const draggedId = ev.dataTransfer.getData("text/plain");
         const draggedEl = document.getElementById(draggedId);
         let targetCell = ev.target.closest('.cell');
 
         if (!targetCell || !draggedEl) return;
 
+        swapImages(draggedEl, targetCell);
+    }
+
+    function swapImages(draggedEl, targetCell) {
         const existingImg = targetCell.querySelector("img");
         const originCell = draggedEl.parentNode;
 
@@ -301,6 +350,70 @@
         if (checkWin()) {
             onWin();
         }
+    }
+
+    function touchStart(ev) {
+        if (gameFinished) return;
+        const touch = ev.touches[0];
+        draggedImg = ev.target;
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+        touchMoved = false;
+        draggedImg.classList.add('dragging');
+
+        touchClone = document.getElementById('touchClone');
+        touchClone.style.display = 'block';
+        touchClone.innerHTML = '';
+        const clone = draggedImg.cloneNode(true);
+        clone.style.width = draggedImg.offsetWidth + 'px';
+        clone.style.height = draggedImg.offsetHeight + 'px';
+        touchClone.appendChild(clone);
+        touchClone.style.left = touch.clientX + 'px';
+        touchClone.style.top = touch.clientY + 'px';
+
+        ev.preventDefault();
+    }
+
+    function touchMove(ev) {
+        if (gameFinished || !draggedImg) return;
+        const touch = ev.touches[0];
+        const dx = touch.clientX - touchStartX;
+        const dy = touch.clientY - touchStartY;
+
+        if (!touchMoved && (Math.abs(dx) > touchThreshold || Math.abs(dy) > touchThreshold)) {
+            touchMoved = true;
+        }
+
+        if (touchMoved && touchClone) {
+            touchClone.style.left = touch.clientX + 'px';
+            touchClone.style.top = touch.clientY + 'px';
+        }
+
+        ev.preventDefault();
+    }
+
+    function touchEnd(ev) {
+        if (gameFinished || !draggedImg) return;
+
+        draggedImg.classList.remove('dragging');
+
+        if (touchClone) {
+            touchClone.style.display = 'none';
+            touchClone.innerHTML = '';
+        }
+
+        if (touchMoved) {
+            const touch = ev.changedTouches[0];
+            const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
+            const targetCell = targetEl ? targetEl.closest('.cell') : null;
+
+            if (targetCell && targetCell !== draggedImg.parentNode) {
+                swapImages(draggedImg, targetCell);
+            }
+        }
+
+        draggedImg = null;
+        touchMoved = false;
     }
 
     function getState() {
@@ -368,11 +481,9 @@
         let attempts = 0;
         let isWin = true;
 
-        // Перемешиваем до тех пор, пока не получим НЕвыигрышную комбинацию
         while (isWin && attempts < 1000) {
             shuffle(shuffled);
 
-            // Временно вставляем в DOM для проверки
             cells.forEach((cell, i) => {
                 cell.innerHTML = "";
                 cell.appendChild(shuffled[i].cloneNode(true));
@@ -382,11 +493,15 @@
             attempts++;
         }
 
-        // Если за 1000 попыток не нашли невыигрышную — оставляем как есть
-        // и вставляем оригиналы (не клоны)
         cells.forEach((cell, i) => {
             cell.innerHTML = "";
-            cell.appendChild(shuffled[i]);
+            const img = shuffled[i];
+            img.draggable = true;
+            img.ondragstart = drag;
+            img.ontouchstart = touchStart;
+            img.ontouchmove = touchMove;
+            img.ontouchend = touchEnd;
+            cell.appendChild(img);
         });
 
         startTimer();
@@ -401,9 +516,5 @@
     }
 
     document.addEventListener('DOMContentLoaded', initGame);
-
-
-
-
 </script>
 {% endblock %}
