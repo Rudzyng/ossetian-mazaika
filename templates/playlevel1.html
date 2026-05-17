@@ -3,7 +3,8 @@
 {% block head %}
 {{ super() }}
 <title>Уровень 1</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
 <style>
     .puzzle-wrapper {
         background: rgba(255, 255, 255, 0.95);
@@ -258,6 +259,7 @@
         transform: translate(-50%, -50%);
         transition: none;
     }
+
 </style>
 {% endblock %}
 
@@ -279,22 +281,26 @@
             <div class="cell" data-pos="0" ondrop="drop(event)" ondragover="allowDrop(event)"
                  ondragenter="dragEnter(event)" ondragleave="dragLeave(event)">
                 <img src="{{ url_for('static', filename='images/level1/1.png') }}" data-num="1" id="img1"
-                     draggable="true" ondragstart="drag(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEnd(event)">
+                     draggable="true" ondragstart="drag(event)" ontouchstart="touchStart(event)"
+                     ontouchmove="touchMove(event)" ontouchend="touchEnd(event)">
             </div>
             <div class="cell" data-pos="1" ondrop="drop(event)" ondragover="allowDrop(event)"
                  ondragenter="dragEnter(event)" ondragleave="dragLeave(event)">
                 <img src="{{ url_for('static', filename='images/level1/2.png') }}" data-num="2" id="img2"
-                     draggable="true" ondragstart="drag(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEnd(event)">
+                     draggable="true" ondragstart="drag(event)" ontouchstart="touchStart(event)"
+                     ontouchmove="touchMove(event)" ontouchend="touchEnd(event)">
             </div>
             <div class="cell" data-pos="2" ondrop="drop(event)" ondragover="allowDrop(event)"
                  ondragenter="dragEnter(event)" ondragleave="dragLeave(event)">
                 <img src="{{ url_for('static', filename='images/level1/3.png') }}" data-num="3" id="img3"
-                     draggable="true" ondragstart="drag(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEnd(event)">
+                     draggable="true" ondragstart="drag(event)" ontouchstart="touchStart(event)"
+                     ontouchmove="touchMove(event)" ontouchend="touchEnd(event)">
             </div>
             <div class="cell" data-pos="3" ondrop="drop(event)" ondragover="allowDrop(event)"
                  ondragenter="dragEnter(event)" ondragleave="dragLeave(event)">
                 <img src="{{ url_for('static', filename='images/level1/4.png') }}" data-num="4" id="img4"
-                     draggable="true" ondragstart="drag(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEnd(event)">
+                     draggable="true" ondragstart="drag(event)" ontouchstart="touchStart(event)"
+                     ontouchmove="touchMove(event)" ontouchend="touchEnd(event)">
             </div>
         </div>
     </div>
@@ -520,8 +526,68 @@
 
         document.getElementById('finalTime').textContent = formatTime(time);
         document.getElementById('winModal').classList.add('show');
+
+        saveResultToServer(1, time);
     }
 
+    function saveResultToServer(level, timeSeconds) {
+        fetch('/api/save_level_result', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                level: level,
+                time_seconds: timeSeconds,
+                time_formatted: formatTime(timeSeconds)
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.is_new_record) {
+                showRecordNotification(data.points, data.time_formatted);
+            }
+            if (data.requires_login) {
+                showLoginPrompt();
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+        });
+    }
+
+    function showRecordNotification(points, timeFormatted) {
+        const notification = document.createElement('div');
+        notification.innerHTML = `
+            <div style="
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: linear-gradient(135deg, #fbbf24, #f59e0b);
+                color: white;
+                padding: 12px 24px;
+                border-radius: 12px;
+                font-weight: 600;
+                font-size: 14px;
+                box-shadow: 0 8px 25px rgba(251, 191, 36, 0.5);
+                z-index: 2000;
+                animation: slideDown 0.3s ease, fadeOut 0.3s ease 2.7s;
+            ">
+                🏆 Новый рекорд! ${points} баллов за ${timeFormatted}
+            </div>
+            <style>
+                @keyframes slideDown { from { top: -60px; opacity: 0; } to { top: 20px; opacity: 1; } }
+                @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+            </style>
+        `;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 3000);
+    }
+
+    function showLoginPrompt() {
+        if (confirm('🎉 Пазл собран! Хотите войти, чтобы сохранить результат?')) {
+            window.location.href = '/login?next=' + window.location.pathname;
+        }
+    }
     function initGame() {
         const cells = document.querySelectorAll(".cell");
         const images = Array.from(document.querySelectorAll(".cell img"));
@@ -573,5 +639,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', initGame);
+
 </script>
 {% endblock %}

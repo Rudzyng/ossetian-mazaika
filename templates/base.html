@@ -131,6 +131,54 @@
         color: #764ba2 !important;
       }
 
+      .btn-login-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 0.35rem 0.8rem;
+        border-radius: 0.5rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+      }
+
+      .btn-login-header:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        color: white;
+        text-decoration: none;
+      }
+
+      .btn-logout-header {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        border: none;
+        padding: 0.35rem 0.8rem;
+        border-radius: 0.5rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+      }
+
+      .btn-logout-header:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        color: white;
+        text-decoration: none;
+      }
+
+      .user-email-header {
+        font-size: 0.8rem;
+        color: #6b7280;
+        margin-right: 0.5rem;
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
       hr {
         margin: 0 !important;
         border: none !important;
@@ -149,13 +197,6 @@
         display: flex;
         flex-direction: column;
         width: 100%;
-      }
-
-      .glass {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 1rem;
       }
 
       ::-webkit-scrollbar {
@@ -190,6 +231,14 @@
 <header>
     <nav class="navbar navbar-light">
         <a class="navbar-brand" href="/">🧩 Осетинская мозаика</a>
+        <div class="d-flex align-items-center">
+            {% if current_user.is_authenticated %}
+            <span class="user-email-header">{{ current_user.email }}</span>
+            <a class="btn-logout-header" href="/logout">Выйти</a>
+            {% else %}
+            <a class="btn-login-header" href="/login">Войти</a>
+            {% endif %}
+        </div>
     </nav>
 </header>
 

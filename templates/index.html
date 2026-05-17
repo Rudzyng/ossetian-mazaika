@@ -93,8 +93,6 @@
     .bg-dec-1 { top: 15%; left: 10%; font-size: 3rem; animation-delay: 0s; }
     .bg-dec-2 { bottom: 20%; right: 12%; font-size: 2.5rem; animation-delay: 1.5s; }
     .bg-dec-3 { top: 60%; left: 15%; font-size: 2rem; animation-delay: 3s; }
-
-
 </style>
 {% endblock %}
 
@@ -117,5 +115,15 @@
     <a href="/rules" class="btn btn-rules" style="max-width:380px;width:100%">
         <span>📜</span>Правила игры
     </a>
+
+    {% if current_user.is_authenticated %}
+    <div style="background: rgba(255,255,255,0.9); border-radius: 1rem; padding: 1rem; width: 100%; max-width: 380px; margin-top: 0.5rem;">
+        <div style="font-weight: 600; color: #374151; margin-bottom: 0.5rem;">📊 Мои рекорды</div>
+        <div style="display: flex; justify-content: space-around; font-size: 0.9rem; color: #6b7280;">
+            <div>🏆 Уровень 1: <strong>{{ current_user.level1 if current_user.level1 else '—' }}</strong></div>
+            <div>🏆 Уровень 2: <strong>{{ current_user.level2 if current_user.level2 else '—' }}</strong></div>
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}
