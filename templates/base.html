@@ -231,14 +231,6 @@
 <header>
     <nav class="navbar navbar-light">
         <a class="navbar-brand" href="/">🧩 Осетинская мозаика</a>
-        <div class="d-flex align-items-center">
-            {% if current_user.is_authenticated %}
-            <span class="user-email-header">{{ current_user.email }}</span>
-            <a class="btn-logout-header" href="/logout">Выйти</a>
-            {% else %}
-            <a class="btn-login-header" href="/login">Войти</a>
-            {% endif %}
-        </div>
     </nav>
 </header>
 

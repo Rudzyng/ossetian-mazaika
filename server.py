@@ -2,7 +2,6 @@ from flask import Flask, render_template, jsonify, request, redirect, url_for, s
 from data import db_session
 from data.User import User
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from datetime import datetime
 import requests
 
 from constants import APP_SECRET_KEY, API_SECRET_KEY, API_URL
@@ -117,7 +116,6 @@ def save_level_result():
 
     points = calculate_points(time_seconds)
     is_new_record = False
-    requires_login = not current_user.is_authenticated
 
     if current_user.is_authenticated:
         db_sess = db_session.create_session()
