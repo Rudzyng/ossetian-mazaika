@@ -1,6 +1,8 @@
-from flask import Flask, render_template, jsonify, request, redirect, url_for, session
+from flask import Flask, render_template, jsonify, request, redirect, url_for, session, flash
 from data import db_session
 from data.User import User
+from data.Level import Level
+from data.PuzzlePart import PuzzlePart
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 import requests
 
@@ -34,17 +36,9 @@ def calculate_points(time_seconds):
 @app.route("/")
 @app.route("/index")
 def index():
-    return render_template("index.html", counters=list(range(1, 3)))
-
-
-@app.route('/play_level1')
-def play_level1():
-    return render_template('playlevel1.html')
-
-
-@app.route('/play_level2')
-def play_level2():
-    return render_template("playlevel2.html")
+    db_sess = db_session.create_session()
+    levels = db_sess.query(Level).all()
+    return render_template("index.html", levels=levels, counters=list(range(1, 3)))
 
 
 @app.route('/rules')
@@ -92,6 +86,28 @@ def login():
         return render_template("login.html", error={"message": "Неверный email или пароль"})
 
 
+@app.route('/play_custom_level/<int:level_id>')
+def play_custom_level(level_id):
+    db_sess = db_session.create_session()
+    level = db_sess.query(Level).get(level_id)
+
+    if not level:
+        flash('Уровень не найден', 'error')
+        return redirect(url_for('index'))
+
+    parts = []
+    for part in sorted(level.parts, key=lambda p: p.part_number):
+        parts.append({
+            'num': part.part_number + 1,
+            'image': f"/static/{part.image_file}"
+        })
+
+    return render_template('play_custom_level.html',
+                           level=level,
+                           parts=parts,
+                           grid_size=level.grid_size)
+
+
 @app.route('/logout')
 @login_required
 def logout():
@@ -107,12 +123,10 @@ def save_level_result():
     if not data:
         return jsonify({'success': False, 'error': 'No data'}), 400
 
-    level = data.get('level')
+    level_id = data.get('level_id')
+    level_num = data.get('level')
     time_seconds = data.get('time_seconds')
     time_formatted = data.get('time_formatted')
-
-    if level not in [1, 2] or time_seconds is None:
-        return jsonify({'success': False, 'error': 'Invalid data'}), 400
 
     points = calculate_points(time_seconds)
     is_new_record = False
@@ -122,13 +136,17 @@ def save_level_result():
         user = db_sess.get(User, current_user.id)
 
         if user:
-            score_field = 'level1' if level == 1 else 'level2'
-            current_best = getattr(user, score_field)
+            if level_id:
+                score_field = f'level_{level_id}'
+                pass
+            elif level_num in [1, 2]:
+                score_field = 'level1' if level_num == 1 else 'level2'
+                current_best = getattr(user, score_field)
 
-            if current_best is None or time_seconds < current_best:
-                setattr(user, score_field, time_seconds)
-                db_sess.commit()
-                is_new_record = True
+                if current_best is None or time_seconds < current_best:
+                    setattr(user, score_field, time_seconds)
+                    db_sess.commit()
+                    is_new_record = True
 
             return jsonify({
                 'success': True,
