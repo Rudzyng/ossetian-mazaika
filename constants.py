@@ -1,3 +1,5 @@
-API_URL = "http://158.160.104.26:9001/api"
-APP_SECRET_KEY = "super-ultimate-secret-duper-notencrypted-key"
-API_SECRET_KEY="cat_1778493968_Nu_2NatlM8mTkkwHyRP2JfnvBJeQ_YPcWcURK_onOrI"
+import os
+
+
+API_URL = os.environ.get("LINGVO_API_URL", "http://game.рудзынг.рф/api")
+APP_SECRET_KEY = os.environ.get("APP_SECRET_KEY", "change-me-in-production")

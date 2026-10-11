@@ -6,8 +6,8 @@ from data.PuzzlePart import PuzzlePart
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 import requests
 
-from constants import APP_SECRET_KEY, API_SECRET_KEY, API_URL
-from utils.login import login as API_login
+from constants import APP_SECRET_KEY
+from utils import api
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = APP_SECRET_KEY
@@ -35,7 +35,10 @@ def calculate_points(time_seconds):
 
 @app.route("/")
 @app.route("/index")
+@app.route("/start")
 def index():
+    # Портал открывает игру как /start?session=<id>&token=<hmac>.
+    api.get_game_session_id()
     db_sess = db_session.create_session()
     levels = db_sess.query(Level).all()
     return render_template("index.html", levels=levels, counters=list(range(1, 3)))
@@ -58,7 +61,7 @@ def login():
         return render_template("login.html", error={"message": "Заполните все поля"})
 
     try:
-        API_login(email, password)
+        api.login(email, password)
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.email == email).first()
 
@@ -130,6 +133,17 @@ def save_level_result():
 
     points = calculate_points(time_seconds)
     is_new_record = False
+    portal_total_points = None
+    portal_error = None
+
+    # Начисление не зависит от локального логина: пользователь уже подтверждён
+    # одноразовой игровой сессией, выданной порталом iframe.
+    if points > 0 and session.get("game_session_id"):
+        try:
+            portal_total_points = api.add_points(points)
+        except api.ApiError as exc:
+            portal_error = str(exc)
+            app.logger.warning("Не удалось начислить баллы портала: %s", exc)
 
     if current_user.is_authenticated:
         db_sess = db_session.create_session()
@@ -154,7 +168,9 @@ def save_level_result():
                 'points': points,
                 'is_new_record': is_new_record,
                 'time_formatted': time_formatted,
-                'requires_login': False
+                'requires_login': False,
+                'portal_total_points': portal_total_points,
+                'portal_error': portal_error
             })
 
     return jsonify({
@@ -163,7 +179,9 @@ def save_level_result():
         'points': points,
         'is_new_record': False,
         'time_formatted': time_formatted,
-        'requires_login': True
+        'requires_login': True,
+        'portal_total_points': portal_total_points,
+        'portal_error': portal_error
     })
 
 
