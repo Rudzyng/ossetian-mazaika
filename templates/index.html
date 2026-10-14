@@ -109,7 +109,7 @@
     <div class="levels-grid" style="max-height: 60vh; overflow-y: auto; padding-right: 4px;">
         {% if levels %}
         {% for level in levels %}
-        <a class="btn btn-level" href="/play_custom_level/{{ level.id }}" role="button">
+        <a class="btn btn-level" href="{{ url_for('play_custom_level', level_id=level.id) }}" role="button">
             <span>🏆</span>{{ level.name }}
             <span style="font-size:0.7rem; opacity:0.8;">({{ level.grid_size }}×{{ level.grid_size }})</span>
         </a>
@@ -117,7 +117,7 @@
         {% endif %}
     </div>
 
-    <a href="/rules" class="btn btn-rules" style="max-width:380px;width:100%">
+    <a href="{{ url_for('rules') }}" class="btn btn-rules" style="max-width:380px;width:100%">
         <span>📜</span>Правила игры
     </a>
 

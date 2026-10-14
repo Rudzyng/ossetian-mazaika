@@ -192,10 +192,10 @@
                 </div>
             </div>
             <div class="level-actions">
-                <a href="/play_custom_level/{{ level.id }}" class="btn-icon btn-play" title="Играть">
+                <a href="{{ url_for('play_custom_level', level_id=level.id) }}" class="btn-icon btn-play" title="Играть">
                     🎮
                 </a>
-                <button onclick="deleteLevel({{ level.id }}, '{{ level.name }}')" class="btn-icon btn-delete"
+                <button onclick="deleteLevel('{{ url_for('delete_level', level_id=level.id) }}', '{{ level.name }}')" class="btn-icon btn-delete"
                         title="Удалить">
                     🗑️
                 </button>
@@ -210,20 +210,20 @@
         </div>
         {% endif %}
 
-        <a href="/create_level" class="btn-create-new">
+        <a href="{{ url_for('create_level') }}" class="btn-create-new">
             ➕ Создать новый уровень
         </a>
 
-        <a href="/" class="btn-back">
+        <a href="{{ url_for('index') }}" class="btn-back">
             🏠 На главную
         </a>
     </div>
 </div>
 
 <script>
-    function deleteLevel(levelId, levelName) {
+    function deleteLevel(deleteUrl, levelName) {
         if (confirm(`Вы уверены, что хотите удалить уровень "${levelName}"?\nЭто действие нельзя отменить.`)) {
-            window.location.href = `/delete_level/${levelId}`;
+            window.location.href = deleteUrl;
         }
     }
 

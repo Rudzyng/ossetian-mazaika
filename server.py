@@ -4,6 +4,8 @@ from data.User import User
 from data.Level import Level
 from data.PuzzlePart import PuzzlePart
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from werkzeug.middleware.proxy_fix import ProxyFix
+import os
 import requests
 
 from constants import APP_SECRET_KEY
@@ -11,6 +13,15 @@ from utils import api
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = APP_SECRET_KEY
+path_base = os.environ.get('GAME_PATH_BASE', '').rstrip('/')
+app.config['APPLICATION_ROOT'] = path_base or '/'
+app.config['SESSION_COOKIE_PATH'] = path_base or '/'
+app.config['SESSION_COOKIE_NAME'] = os.environ.get(
+    'GAME_COOKIE_NAME', 'lingvogameos_mazaika_session'
+)
+app.wsgi_app = ProxyFix(
+    app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1
+)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -102,7 +113,7 @@ def play_custom_level(level_id):
     for part in sorted(level.parts, key=lambda p: p.part_number):
         parts.append({
             'num': part.part_number + 1,
-            'image': f"/static/{part.image_file}"
+            'image': url_for('static', filename=part.image_file)
         })
 
     return render_template('play_custom_level.html',

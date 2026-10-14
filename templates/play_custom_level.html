@@ -512,7 +512,7 @@
     }
 
     function goBack() {
-        window.location.href = "/";
+        window.location.href = "{{ url_for('index') }}";
     }
 
     document.addEventListener('DOMContentLoaded', initGame);
