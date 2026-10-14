@@ -231,6 +231,11 @@
 <header>
     <nav class="navbar navbar-light">
         <a class="navbar-brand" href="{{ url_for('index') }}">🧩 Осетинская мозаика</a>
+        {% if session.get('portal_user_name') %}
+        <span class="user-email-header" title="Пользователь LingvoGameOs">
+            {{ session['portal_user_name'] }}
+        </span>
+        {% endif %}
     </nav>
 </header>
 

@@ -3,10 +3,9 @@ from data import db_session
 from data.User import User
 from data.Level import Level
 from data.PuzzlePart import PuzzlePart
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from flask_login import LoginManager, login_required, logout_user, current_user
 from werkzeug.middleware.proxy_fix import ProxyFix
 import os
-import requests
 
 from constants import APP_SECRET_KEY
 from utils import api
@@ -28,6 +27,7 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 db_session.global_init("db/mozaika.db")
+PORTAL_URL = os.environ.get("PORTAL_URL", "http://localhost:5086").rstrip("/")
 
 
 @login_manager.user_loader
@@ -48,8 +48,10 @@ def calculate_points(time_seconds):
 @app.route("/index")
 @app.route("/start")
 def index():
-    # Портал открывает игру как /start?session=<id>&token=<hmac>.
-    api.get_game_session_id()
+    try:
+        api.get_game_session()
+    except api.ApiError as exc:
+        return f"Игровая сессия отклонена: {exc}", 401
     db_sess = db_session.create_session()
     levels = db_sess.query(Level).all()
     return render_template("index.html", levels=levels, counters=list(range(1, 3)))
@@ -60,44 +62,9 @@ def rules():
     return render_template("rules.html")
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login')
 def login():
-    if request.method == "GET":
-        return render_template("login.html")
-
-    email = request.form.get("email")
-    password = request.form.get("password")
-
-    if not (email and password):
-        return render_template("login.html", error={"message": "Заполните все поля"})
-
-    try:
-        api.login(email, password)
-        db_sess = db_session.create_session()
-        user = db_sess.query(User).filter(User.email == email).first()
-
-        if not user:
-            user = User()
-            user.email = email
-            user.set_password(password)
-            db_sess.add(user)
-            db_sess.commit()
-
-        login_user(user)
-        session["user_id"] = user.id
-        session["user_email"] = user.email
-
-        next_page = request.args.get('next')
-        if next_page:
-            return redirect(next_page)
-        return redirect(url_for("index"))
-
-    except requests.exceptions.RequestException as e:
-        print(f"Ошибка API login: {e}")
-        return render_template("login.html", error={"message": "Ошибка соединения с сервером"})
-    except Exception as e:
-        print(f"Ошибка: {e}")
-        return render_template("login.html", error={"message": "Неверный email или пароль"})
+    return redirect(f"{PORTAL_URL}/Account/Login")
 
 
 @app.route('/play_custom_level/<int:level_id>')
@@ -184,13 +151,14 @@ def save_level_result():
                 'portal_error': portal_error
             })
 
+    portal_user = bool(session.get("portal_user_id"))
     return jsonify({
         'success': True,
-        'message': 'Войдите, чтобы сохранить результат',
+        'message': 'Результат сохранён в профиле портала' if portal_user else 'Войдите, чтобы сохранить результат',
         'points': points,
         'is_new_record': False,
         'time_formatted': time_formatted,
-        'requires_login': True,
+        'requires_login': not portal_user,
         'portal_total_points': portal_total_points,
         'portal_error': portal_error
     })
