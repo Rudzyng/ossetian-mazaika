@@ -26,6 +26,13 @@ def get_game_session_id() -> int | None:
 
 def get_game_session():
     """Проверяет HMAC и сохраняет профиль пользователя портала."""
+    if request.args.get("guest") == "1":
+        if request.args.get("session") is not None or request.args.get("token") is not None:
+            raise ApiError("Гостевой запуск не принимает сессию и токен.")
+        session.clear()
+        session["portal_guest"] = True
+        return None
+
     game_session_id = get_game_session_id()
     if not game_session_id:
         return None
@@ -65,6 +72,7 @@ def get_game_session():
 
     session["game_session_id"] = game_session_id
     session["game_session_token"] = token
+    session.pop("portal_guest", None)
     session["portal_user_id"] = data["userId"]
     session["portal_user_name"] = data.get("userName") or "Игрок"
     session["portal_total_points"] = data.get("totalUserPoints", 0)
@@ -73,6 +81,8 @@ def get_game_session():
 
 def add_points(amount: int) -> int:
     """Однократно начисляет целые положительные баллы игровой сессии."""
+    if session.get("portal_guest"):
+        return 0
     game_session_id = session.get("game_session_id")
     if not game_session_id:
         raise ApiError("Игра запущена не с портала: сессия не выдана.")
