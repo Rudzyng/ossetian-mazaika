@@ -458,7 +458,7 @@
         return isWinningState(getState());
     }
 
-    function onWin() {
+    async function onWin() {
         gameFinished = true;
         const time = stopTimer();
 
@@ -472,6 +472,24 @@
         document.getElementById('btnHome').style.display = "flex";
         document.getElementById('finalTime').textContent = formatTime(time);
         document.getElementById('winModal').classList.add('show');
+
+        try {
+            const response = await fetch({{ url_for('save_level_result') | tojson }}, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    level_id: {{ level.id }},
+                    time_seconds: time,
+                    time_formatted: formatTime(time)
+                })
+            });
+            const result = await response.json();
+            if (!response.ok || !result.success || result.portal_error) {
+                console.error('Не удалось сохранить результат мозаики:', result.portal_error || result.error);
+            }
+        } catch (error) {
+            console.error('Не удалось сохранить результат мозаики:', error);
+        }
     }
 
     function initGame() {
